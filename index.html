@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#3b82f6" />
+    <title>Gc's Angelim</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <!-- Netlify Identity Widget -->
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+    <link rel="stylesheet" href="./src/style.css">
+  </head>
+  <body class="bg-gray-50 text-gray-900 font-sans h-screen flex flex-col overflow-hidden">
+    
+    <!-- Navbar Premium -->
+    <header class="bg-white shadow-md z-10 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <!-- Espaço para a logo -->
+            <h1 class="text-2xl font-bold text-brand-dark tracking-tight">Gc's Angelim</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <!-- Container Identity Netlify -->
+            <div data-netlify-identity-menu></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 relative w-full h-full flex flex-col md:flex-row">
+      
+      <!-- App Status / Erro - Ocultado por padrão -->
+      <div id="app-status" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg" role="alert">
+        <strong class="font-bold">Atenção:</strong>
+        <span class="block sm:inline" id="app-status-message"></span>
+      </div>
+
+      <!-- Mapa -->
+      <div id="map-container" class="flex-1 w-full h-full z-0 transition-all duration-300">
+        <div id="map" class="w-full h-full"></div>
+      </div>
+
+      <!-- Admin / Editor Sidebar (Escondida por Padrão) -->
+      <aside id="admin-panel" class="hidden bg-white w-full md:w-96 shadow-xl z-20 flex-col transition-all duration-300 md:h-full overflow-y-auto border-l border-gray-200">
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-4" id="admin-title">Painel de Controle</h2>
+          <div id="admin-content" class="space-y-4">
+            <!-- Conteúdo carregado via JS -->
+            <p class="text-sm text-gray-600">Autenticado com sucesso. Buscando dados...</p>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+
+    <!-- Generic Error Wrapper (Security) -->
+    <script type="module" src="./src/main.js"></script>
+    <script>
+      // Registro do Service Worker para PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js').then((reg) => {
+            console.log('Service worker registrado offline.', reg.scope);
+          }).catch((err) => {
+            console.log('Service worker falhou.', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
