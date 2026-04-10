@@ -59,7 +59,8 @@ exports.handler = async (event, context) => {
       { id: 22, nome: "GC Colina", dia: "Terça-feira", horario: "19h30", bairro: "João XXIII", endereco: "Conj Colina da Alvorada 1 Quadra 15, Casa 09", lider: "Douglas Souza & Joelya Karla", contato: "(86) 99990-5846", lat: "-2.9160", lng: "-41.7310" },
       { id: 23, nome: "GC Floriópolis III", dia: "Terça-feira", horario: "20h", bairro: "Floriópolis", endereco: "Loteamento Conviver IV, Q17, C 06", lider: "Bruna Mendonça", contato: "(86) 98120-2046", lat: "-2.9330", lng: "-41.7440" },
       { id: 24, nome: "GC Afya Parnaíba I", dia: "Terça", horario: "16h", bairro: "Sabiazal", endereco: "Faculdade Afya Parnaíba", lider: "Ana Tavares", contato: "(86) 99477-5852", obs: "Área Verde", lat: "-2.9410", lng: "-41.7790" },
-      { id: 25, nome: "GC Reis Veloso", dia: "Sexta", horario: "14:30", bairro: "Reis Veloso", endereco: "Rua Abigail Nogueira Batista 205", lider: "Ana Tavares", contato: "(86) 99477-5852", lat: "-2.9010", lng: "-41.7500" }
+      { id: 25, nome: "GC Reis Veloso", dia: "Sexta", horario: "14:30", bairro: "Reis Veloso", endereco: "Rua Abigail Nogueira Batista 205", lider: "Ana Tavares", contato: "(86) 99477-5852", lat: "-2.9010", lng: "-41.7500" },
+      { id: 26, nome: "Igreja Angelim Parnaíba (Sede)", dia: "Vários", horario: "Diversos", bairro: "Reis Veloso", endereco: "Av. Dep. Pinheiro Machado, 115", lider: "Igreja Local", contato: "-", obs: "Cultos: Qua 19:30 | Sáb 18:00 | Dom 10:00 e 18:00", lat: "-2.9049254", lng: "-41.7534294" }
     ];
 
     const sanitizedPayload = rawData.map(item => ({
