@@ -158,7 +158,7 @@ function renderGCMarkers(gcs) {
             
             <p class="text-gray-800 leading-tight">
               <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Quando</span> 
-              ${dia}, às ${time}
+              ${gc.id === 26 ? `<strong class="text-brand-dark font-black">Qua</strong> 19h30 &nbsp;&bull;&nbsp; <strong class="text-brand-dark font-black">Sáb</strong> 18h &nbsp;&bull;&nbsp; <strong class="text-brand-dark font-black">Dom</strong> 10h e 18h` : `${dia}, às ${time}`}
             </p>
 
             <p class="text-gray-800 leading-tight mt-1">
@@ -172,13 +172,14 @@ function renderGCMarkers(gcs) {
               ${leader}
             </p>
             
-            <p class="text-gray-800 leading-tight">
+            ${contato && contato !== '-' ? `
+            <p class="text-gray-800 leading-tight mt-1">
               <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Contato</span> 
               <a href="${wppLink}" target="_blank" class="text-green-600 hover:text-green-700 font-bold flex items-center hover:underline cursor-pointer">
                 <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 001.333 4.993L2 22l5.233-1.237a9.994 9.994 0 004.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0012.012 2zm5.796 14.34c-.241.677-1.192 1.3-1.637 1.339-.427.039-1.272.183-3.64-1.393-2.844-1.894-4.664-5.006-4.805-5.197-.139-.193-1.147-1.545-1.147-2.946 0-1.402.723-2.096.979-2.366.255-.269.554-.338.735-.338.181 0 .363.003.521.01.168.007.391-.065.611.468.225.545.728 1.782.793 1.916.064.135.105.293.023.456-.081.161-.122.256-.242.39-.12.135-.251.29-.36.402-.121.121-.249.255-.109.497.139.24 .618.99 1.296 1.597.876.784 1.6026 1.028 1.843 1.15.241.12.383.099.525-.065.143-.162.617-.714.782-.96.164-.244.327-.202.551-.12.224.081 1.416.666 1.658.788.242.12.404.181.463.282.059.101.059.585-.182 1.261z"/></svg>
                 ${contato}
               </a>
-            </p>
+            </p>` : ''}
 
             ${obs ? `<div class="bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold px-2 py-1 rounded w-full mt-1.5"><strong class="uppercase text-amber-600 block text-[9px] min-w-full">Observação</strong>${obs}</div>` : ''}
 

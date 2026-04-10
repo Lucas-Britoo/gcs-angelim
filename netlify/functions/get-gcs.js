@@ -6,16 +6,16 @@ exports.handler = async (event, context) => {
     // 1. Authentication Bypass Prevention
     // Netlify Identity no Netlify Functions injeta context.clientContext.user se o header de Auth vier correto.
     // O JWT é decriptado pela infraestrutura gerenciavel no header Authorization: Bearer <token>
-    
+
     // NOTA: Para acesso público aos pontos do mapa (sem ser dashboard admin) a gente pode ou não bloquear public requests.
     // Vamos basear na role. No planejamento, o mapa público mostra apenas alguns campos? Ou as coordenadas são privadas?
     // Vamos assumir que buscar dados básicos é público, mas buscar TUDO exige token.
-    
+
     // Mock de permissão
     const user = context.clientContext && context.clientContext.user;
-    
+
     let isPublicRequest = !user;
-    
+
     // Se não for requisição pública, verificamos roles:
     if (!isPublicRequest) {
       const roles = user.app_metadata?.roles || [];
@@ -32,7 +32,7 @@ exports.handler = async (event, context) => {
     // Apenas requisições de servidor (esta AWS Lambda) tem acesso ao endpoint CSV real.
     // Aqui você vai preencher sua Google Sheets public CSV export link.
     // Ex: const SPREADSHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX.../pub?gid=0&single=true&output=csv`;
-    
+
     // Mock de dados da planilha convertida para JSON estruturado
     const rawData = [
       { id: 1, nome: "GC Sao Francisco", dia: "Sexta", horario: "19:30", bairro: "São Francisco", endereco: "Rua Joaquim Santos, 621", lider: "Álefe e Camila", contato: "(86) 99918-6632", lat: "-2.9105", lng: "-41.7650" },
@@ -60,7 +60,7 @@ exports.handler = async (event, context) => {
       { id: 23, nome: "GC Floriópolis III", dia: "Terça-feira", horario: "20h", bairro: "Floriópolis", endereco: "Loteamento Conviver IV, Q17, C 06", lider: "Bruna Mendonça", contato: "(86) 98120-2046", lat: "-2.9330", lng: "-41.7440" },
       { id: 24, nome: "GC Afya Parnaíba I", dia: "Terça", horario: "16h", bairro: "Sabiazal", endereco: "Faculdade Afya Parnaíba", lider: "Ana Tavares", contato: "(86) 99477-5852", obs: "Área Verde", lat: "-2.9410", lng: "-41.7790" },
       { id: 25, nome: "GC Reis Veloso", dia: "Sexta", horario: "14:30", bairro: "Reis Veloso", endereco: "Rua Abigail Nogueira Batista 205", lider: "Ana Tavares", contato: "(86) 99477-5852", lat: "-2.9010", lng: "-41.7500" },
-      { id: 26, nome: "Igreja Angelim Parnaíba (Sede)", dia: "Qua, Sáb e Dom", horario: "19h30, 18h e 10h/18h", bairro: "Reis Veloso", endereco: "Av. Dep. Pinheiro Machado, 115", lider: "Igreja Local", contato: "-", lat: "-2.904959551930751", lng: "-41.75327635838159" }
+      { id: 26, nome: "Igreja Angelim Parnaíba (Sede)", dia: "Qua, Sáb e Dom", horario: "19h30, 18h e 10h/18h", bairro: "Reis Veloso", endereco: "Av. Dep. Pinheiro Machado, 115", lat: "-2.904959551930751", lng: "-41.75327635838159" }
     ];
 
     const sanitizedPayload = rawData.map(item => ({
@@ -85,7 +85,7 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify(sanitizedPayload)
     };
-    
+
   } catch (error) {
     console.error("Function Error:", error);
     return {
