@@ -62,9 +62,10 @@
       </div>
 
       <!-- Netlify Identity Wrapper Ocultando a UI suja e deixando limpo -->
-      <div class="identity-wrapper ml-2">
-        <div data-netlify-identity-menu></div>
-      </div>
+      <!-- Botão Discreto de Login Admin (Cadeado Translúcido no Canto Superior Direito) -->
+  <button onclick="if(window.netlifyIdentity) window.netlifyIdentity.open('login')" aria-label="Login de Administrador" class="fixed top-5 right-5 opacity-30 hover:opacity-100 transition-opacity z-[800] p-2.5 rounded-full bg-white backdrop-blur-md shadow-sm border border-gray-200 text-gray-500 active:scale-95 cursor-pointer">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+  </button>
     </div>
 
     <!-- Barra de Pesquisa Interna -->
