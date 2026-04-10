@@ -121,16 +121,27 @@ function renderGCMarkers(gcs) {
 
     const navUrl = sanitize(`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`);
 
-    // Construção segura (usamos innerHTML apenas com variáveis já passadas pelo strict sanitize())
+    // Construção segura premium google maps style
     const popupContent = `
-      <div class="p-2 custom-popup min-w-[200px]">
-        <h3 class="font-bold text-lg text-brand-dark mb-1">${name}</h3>
-        <p class="text-sm text-gray-700"><strong>Líder:</strong> ${leader}</p>
-        <p class="text-sm text-gray-700"><strong>Horário:</strong> ${time}</p>
-        ${distanceText}
-        <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="mt-3 block w-full text-center bg-brand text-white py-2 rounded-md font-semibold hover:bg-brand-accent transition-colors">
-          Como Chegar
-        </a>
+      <div class="custom-popup min-w-[220px]">
+        <div class="bg-brand-dark p-3 rounded-t-2xl">
+          <h3 class="font-bold text-base text-white leading-tight">${name}</h3>
+          ${distanceText ? `<p class="text-xs text-brand-light opacity-90 mt-1">📍 ${dist.toFixed(1)} km de você</p>` : ''}
+        </div>
+        <div class="p-4 bg-white rounded-b-2xl">
+          <div class="flex flex-col gap-1 mb-4">
+            <p class="text-sm text-gray-800 flex items-center gap-2">
+              <span class="font-bold text-gray-400">Líder:</span> ${leader}
+            </p>
+            <p class="text-sm text-gray-800 flex items-center gap-2">
+              <span class="font-bold text-gray-400">Quando:</span> ${time}
+            </p>
+          </div>
+          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-brand-dark text-white py-2.5 rounded-lg text-sm font-bold hover:bg-brand-accent transition-all shadow-md active:scale-95">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            ROTAS
+          </a>
+        </div>
       </div>
     `;
 

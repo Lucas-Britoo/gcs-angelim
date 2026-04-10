@@ -1,80 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#3b82f6" />
-    <title>Gc's Angelim</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    
-    <!-- Netlify Identity Widget -->
-    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-    <link rel="stylesheet" href="./src/style.css">
-  </head>
-  <body class="bg-gray-50 text-gray-900 font-sans h-screen flex flex-col overflow-hidden">
-    
-    <!-- Navbar Premium -->
-    <header class="bg-white shadow-md z-10 relative">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <div class="flex-shrink-0 flex items-center">
-            <!-- Espaço para a logo -->
-            <h1 class="text-2xl font-bold text-brand-dark tracking-tight">Gc's Angelim</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <!-- Container Identity Netlify -->
-            <div data-netlify-identity-menu></div>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#171717" />
+  <title>Gc's Angelim</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Netlify Identity Widget -->
+  <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body class="bg-gray-100 text-gray-900 font-sans h-screen w-full overflow-hidden relative">
+
+  <!-- Mapa Fullscreen Background -->
+  <div id="map-container" class="absolute inset-0 z-0 w-full h-full">
+    <div id="map" class="w-full h-full"></div>
+  </div>
+
+  <!-- Interface Flutuante: Tipo Google Maps -->
+
+  <!-- Barra Superior / Busca (Desktop: Top-Left / Mobile: Top-Center) -->
+  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-96 z-[1000] flex flex-col gap-2 pointer-events-none">
+
+    <!-- Caixa Principal (Logo + Auth) -->
+    <div
+      class="bg-white/95 backdrop-blur-md shadow-lg rounded-2xl p-3 flex items-center justify-between border border-gray-200 pointer-events-auto transition-transform duration-300 hover:shadow-xl">
+      <div class="flex items-center gap-3">
+        <!-- Logo - Altere logo.png para a extensao correta caso seja jpg ou svg -->
+        <div
+          class="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center overflow-hidden shrink-0 border-2 border-brand-light">
+          <img src="/logo.png" alt="Logo Angelim" class="w-full h-full object-cover object-center fallback-logo"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <!-- Fallback Icon caso a logo falhe ao carregar -->
+          <svg class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8">
+            </path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold text-gray-900 tracking-tight leading-tight">ANGELIM</h1>
+          <h2 class="text-xs font-semibold text-gray-500 tracking-widest uppercase">Parnaíba</h2>
         </div>
       </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 relative w-full h-full flex flex-col md:flex-row">
-      
-      <!-- App Status / Erro - Ocultado por padrão -->
-      <div id="app-status" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg" role="alert">
-        <strong class="font-bold">Atenção:</strong>
-        <span class="block sm:inline" id="app-status-message"></span>
+      <!-- Netlify Identity Wrapper Ocultando a UI suja e deixando limpo -->
+      <div class="identity-wrapper ml-2">
+        <div data-netlify-identity-menu></div>
       </div>
+    </div>
 
-      <!-- Mapa -->
-      <div id="map-container" class="flex-1 w-full h-full z-0 transition-all duration-300">
-        <div id="map" class="w-full h-full"></div>
+    <!-- App Status / Erro - Oculto por padrão -->
+    <div id="app-status"
+      class="hidden bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-md pointer-events-auto text-xs font-semibold"
+      role="alert">
+      <span id="app-status-message"></span>
+    </div>
+
+  </header>
+
+  <!-- Side/Bottom Panel para Admin e Editor - Flutuante -->
+  <aside id="admin-panel"
+    class="hidden absolute bottom-0 left-0 right-0 md:bottom-auto md:top-24 md:left-4 md:w-96 z-[1000] bg-white/95 backdrop-blur-md shadow-2xl rounded-t-3xl md:rounded-2xl border border-gray-200 flex-col transition-all duration-500 transform translate-y-full md:translate-y-0 max-h-[60vh] md:max-h-[calc(100vh-8rem)] overflow-hidden pointer-events-auto">
+
+    <!-- 'Handle' Mobile para puxar o painel -->
+    <div class="md:hidden w-full flex justify-center py-3 active:bg-gray-100 rounded-t-3xl cursor-grab">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+    </div>
+
+    <div class="p-5 md:pt-6 overflow-y-auto w-full h-full custom-scroll">
+      <h3 class="text-lg font-black text-gray-900 mb-2 uppercase tracking-wide" id="admin-title">Painel</h3>
+      <div id="admin-content" class="space-y-4 text-sm text-gray-800">
+        <p class="animate-pulse">Sincronizando base de dados...</p>
       </div>
+    </div>
+  </aside>
 
-      <!-- Admin / Editor Sidebar (Escondida por Padrão) -->
-      <aside id="admin-panel" class="hidden bg-white w-full md:w-96 shadow-xl z-20 flex-col transition-all duration-300 md:h-full overflow-y-auto border-l border-gray-200">
-        <div class="p-6">
-          <h2 class="text-xl font-bold text-gray-800 mb-4" id="admin-title">Painel de Controle</h2>
-          <div id="admin-content" class="space-y-4">
-            <!-- Conteúdo carregado via JS -->
-            <p class="text-sm text-gray-600">Autenticado com sucesso. Buscando dados...</p>
-          </div>
-        </div>
-      </aside>
-
-    </main>
-
-    <!-- Generic Error Wrapper (Security) -->
-    <script type="module" src="./src/main.js"></script>
-    <script>
-      // Registro do Service Worker para PWA
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js').then((reg) => {
-            console.log('Service worker registrado offline.', reg.scope);
-          }).catch((err) => {
-            console.log('Service worker falhou.', err);
-          });
+  <script type="module" src="./src/main.js"></script>
+  <script>
+    // Registro do Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').then((reg) => {
+          console.log('SW offline ok.');
+        }).catch((err) => {
+          console.log('SW fail.', err);
         });
-      }
-    </script>
-  </body>
+      });
+    }
+
+    // Animação de entrada do Admin Panel para Mobile (efeito Bottom Sheet)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.target.classList.contains('flex')) {
+          setTimeout(() => mutation.target.classList.remove('translate-y-full'), 50);
+        } else {
+          mutation.target.classList.add('translate-y-full');
+        }
+      });
+    });
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel) observer.observe(adminPanel, { attributes: true, attributeFilter: ['class'] });
+  </script>
+</body>
+
 </html>
