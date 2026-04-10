@@ -46,6 +46,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 let map = null;
 let userLocation = null;
 let markersLayer = new L.LayerGroup();
+let globalGCs = []; // Guarda a lista pra barra de pesquisa
 
 function initMap() {
   try {
@@ -173,7 +174,65 @@ function renderGCMarkers(gcs) {
       </div>
     `;
 
-    L.marker(coords).addTo(markersLayer).bindPopup(popupContent);
+    const marker = L.marker(coords).bindPopup(popupContent);
+    gc._leafletMarker = marker; // Salvando referência para a Pesquisa
+    marker.addTo(markersLayer);
+  });
+}
+
+/**
+ * Motor de Busca da Barra Superior
+ */
+function setUpSearch() {
+  const input = document.getElementById('search-input');
+  const resultsBox = document.getElementById('search-results');
+  if(!input || !resultsBox) return;
+
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !resultsBox.contains(e.target)) resultsBox.classList.add('hidden');
+  });
+
+  input.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase().trim();
+    if (term.length < 2) {
+      resultsBox.classList.add('hidden');
+      return;
+    }
+
+    const filtered = globalGCs.filter(gc => {
+      const nomeSafe = gc.nome ? gc.nome.toLowerCase() : '';
+      const bairroSafe = gc.bairro ? gc.bairro.toLowerCase() : '';
+      const liderSafe = gc.lider ? gc.lider.toLowerCase() : '';
+      return nomeSafe.includes(term) || bairroSafe.includes(term) || liderSafe.includes(term);
+    });
+
+    if (filtered.length > 0) {
+      resultsBox.innerHTML = filtered.map(gc => {
+        return `<li class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-colors" data-id="${gc.id}">
+          <strong class="block text-brand-dark">${sanitize(gc.nome)}</strong>
+          <span class="text-xs text-gray-500">${sanitize(gc.bairro)} • Líder: ${sanitize(gc.lider)}</span>
+        </li>`;
+      }).join('');
+      resultsBox.classList.remove('hidden');
+
+      resultsBox.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => {
+          const id = parseInt(li.getAttribute('data-id'));
+          const targetGC = globalGCs.find(g => g.id === id);
+          if(targetGC && targetGC.lat && targetGC.lng && targetGC._leafletMarker) {
+            map.flyTo([parseFloat(targetGC.lat), parseFloat(targetGC.lng)], 16, { duration: 1.2 });
+            setTimeout(() => targetGC._leafletMarker.openPopup(), 1200);
+          } else if (targetGC && !targetGC.lat) {
+            showError("Este GC é Online. Não possui localização no mapa.");
+          }
+          resultsBox.classList.add('hidden');
+          input.value = '';
+        });
+      });
+    } else {
+      resultsBox.innerHTML = `<li class="px-4 py-3 text-gray-400 text-xs text-center border-none">Nenhum banco de dados ou local encontrado.</li>`;
+      resultsBox.classList.remove('hidden');
+    }
   });
 }
 
@@ -202,7 +261,9 @@ async function fetchGCs() {
 
     const data = await res.json();
     if (Array.isArray(data)) {
+      globalGCs = data; // Guarda pro auto-complete
       renderGCMarkers(data);
+      setUpSearch();
     }
   } catch (error) {
     console.error("Fetch falhou", error);
