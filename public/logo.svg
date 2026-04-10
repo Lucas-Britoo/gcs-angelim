@@ -1,0 +1,24 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="circleClip">
+      <circle cx="100" cy="100" r="100" />
+    </clipPath>
+  </defs>
+  
+  <g clip-path="url(#circleClip)">
+    <!-- Fundo Escuro -->
+    <circle cx="100" cy="100" r="100" fill="#171717" />
+    
+    <!-- Tronco -->
+    <path d="M 96 210 Q 92 100 105 -10" stroke="#FFFFFF" stroke-width="18" fill="none"/>
+    
+    <!-- Galhos Esquerda -->
+    <path d="M 95 150 Q 50 120 -10 170" stroke="#FFFFFF" stroke-width="17" fill="none" />
+    <path d="M 98 90 Q 60 70 20 20" stroke="#FFFFFF" stroke-width="16" fill="none" />
+    <path d="M 100 50 Q 70 30 40 -10" stroke="#FFFFFF" stroke-width="15" fill="none" />
+
+    <!-- Galhos Direita -->
+    <path d="M 95 130 Q 160 130 210 160" stroke="#FFFFFF" stroke-width="17" fill="none" />
+    <path d="M 100 70 Q 150 50 180 -10" stroke="#FFFFFF" stroke-width="16" fill="none" />
+  </g>
+</svg>
