@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gcs-angelim-v1';
+const CACHE_NAME = 'gcs-angelim-v2';
 const urlsToCache = [
   '/',
   '/index.html',

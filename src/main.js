@@ -445,19 +445,39 @@ function handleAuthChange(user) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("App v1.2.0 - DOM Loaded");
+  
   // Inicializa mapa
   initMap();
 
   // Netlify Identity Handlers
   if (window.netlifyIdentity) {
-    // Inicialização manual obrigatória para botões customizados
+    console.log("Netlify Identity Widget detectado.");
     window.netlifyIdentity.init();
     
-    window.netlifyIdentity.on("init", user => handleAuthChange(user));
+    // Listener de clique para o botão de Login (Cadeado)
+    const lockBtn = document.getElementById('auth-lock-btn');
+    if (lockBtn) {
+      lockBtn.addEventListener('click', () => {
+        console.log("Abrindo Modal de Login...");
+        window.netlifyIdentity.open('login');
+      });
+    }
+
+    window.netlifyIdentity.on("init", user => {
+      console.log("Identity Initialized", user ? "User: " + user.email : "No User");
+      handleAuthChange(user);
+    });
     window.netlifyIdentity.on("login", user => {
+      console.log("Login Success", user.email);
       window.netlifyIdentity.close();
       handleAuthChange(user);
     });
-    window.netlifyIdentity.on("logout", () => handleAuthChange(null));
+    window.netlifyIdentity.on("logout", () => {
+      console.log("Logout Event");
+      handleAuthChange(null);
+    });
+  } else {
+    console.warn("Netlify Identity Widget não encontrado no window.");
   }
 });
