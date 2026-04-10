@@ -265,6 +265,7 @@ function setUpSearch() {
       resultsBox.innerHTML = `<li class="px-4 py-3 text-gray-400 text-xs text-center border-none">Nenhum banco de dados ou local encontrado.</li>`;
       resultsBox.classList.remove('hidden');
     }
+    }, 250);
   });
 }
 
