@@ -126,31 +126,6 @@
   </style>
 
   <script type="module" src="./src/main.js"></script>
-  <script>
-    // Registro do Service Worker para PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').then((reg) => {
-          console.log('SW offline ok.');
-        }).catch((err) => {
-          console.log('SW fail.', err);
-        });
-      });
-    }
-
-    // Animação de entrada do Admin Panel para Mobile (efeito Bottom Sheet)
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.target.classList.contains('flex')) {
-          setTimeout(() => mutation.target.classList.remove('translate-y-full'), 50);
-        } else {
-          mutation.target.classList.add('translate-y-full');
-        }
-      });
-    });
-    const adminPanel = document.getElementById('admin-panel');
-    if (adminPanel) observer.observe(adminPanel, { attributes: true, attributeFilter: ['class'] });
-  </script>
 </body>
 
 </html>

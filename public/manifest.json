@@ -3,12 +3,12 @@
   "name": "Localizador de Gc's Angelim",
   "icons": [
     {
-      "src": "/vite.svg",
+      "src": "/logo.svg",
       "type": "image/svg+xml",
       "sizes": "192x192"
     },
     {
-      "src": "/vite.svg",
+      "src": "/logo.svg",
       "type": "image/svg+xml",
       "sizes": "512x512"
     }

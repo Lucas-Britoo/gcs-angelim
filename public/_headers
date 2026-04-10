@@ -1,28 +1,57 @@
-/* CSP (Content Security Policy) robusta e HSTS */
-/* Zero Trust */
-/* Permite Leaflet, OSM e Netlify Identity - Bloqueia resto */
-/* O Netlify injecta certas coisas da Identity, por isso incluimos o cdn.jsdelivr.net para o widget */
-/* frame-ancestors 'none' evita clickjacking */
-/* sem 'unsafe-eval' e 'unsafe-inline' para scripts */
+/* Regras globais para o PWA Gcs Angelim */
+/* Configuração de Segurança Zero Trust */
 
-/* No localhost o Vite requer algumas permissões inline, mas para prod focamos estritamente */
-/* As permissões de map tiles requerem connect-src para OSM */
-/* identity.netlify.com deve constar aqui */
-
-/* As regras abaixo são aplicadas em todos os paths e assets /* */
+/* Cabeçalhos para todos os arquivos */
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.netlify.com https://identity.netlify.com; frame-ancestors 'none';
+  X-Permitted-Cross-Domain-Policies: none
 */
 
-/* O Netlify processa o cabeçalho base abaixo: */
+/* Content Security Policy Detalhada */
+/* Permitimos fontes Google e CDN unpkg para Leaflet */
+/* Default-src 'self' bloqueia tudo por padrão */
+/* Script-src removemos unsafe-inline pois toda lógica está em arquivos JS */
+/* Style-src mantemos unsafe-inline apenas para o motor do Tailwind/Leaflet */
+
+/index.html
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.netlify.com https://identity.netlify.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';
+
+/* Headers simplificados para compatibilidade com o Netlify Parser */
+/* (Netlify não gosta de comentários /* dentro de blocos de cabeçalho ativos) */
+
+/* Versão Final Ativa */
 /*
+/ 
+X-Frame-Options: DENY 
+X-Content-Type-Options: nosniff 
+Referrer-Policy: same-origin 
+Content-Security-Policy: default-src 'self'; script-src 'self' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.netlify.com https://identity.netlify.com; frame-ancestors 'none';
+*/
+
+/* O Netlify processa melhor sem comentários aninhados. Vou deixar apenas o essencial abaixo: */
+
+/* A partir desta linha são os comandos lidos pelo servidor */
+/*
+/ 
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.netlify.com;
+*/
+
+/* REESCRITA LIMPA COMPATÍVEL COM PARSER DO NETLIFY */
+
+/* Global */
+/* 
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+*/
+
+/* Homepage */
+/
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.netlify.com; frame-ancestors 'none';
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.netlify.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';
-*/

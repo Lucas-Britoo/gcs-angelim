@@ -445,10 +445,36 @@ function handleAuthChange(user) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("App v1.2.0 - DOM Loaded");
+  console.log("App v1.2.1 - DOM Loaded (Security Patch)");
   
   // Inicializa mapa
   initMap();
+
+  // Registro do Service Worker para PWA (Movido para cá devido ao CSP)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').then((reg) => {
+        console.log('SW registration successful with scope: ', reg.scope);
+      }).catch((err) => {
+        console.warn('SW registration failed: ', err);
+      });
+    });
+  }
+
+  // Animação de entrada do Admin Panel (Movido para cá devido ao CSP)
+  const adminPanel = document.getElementById('admin-panel');
+  if (adminPanel) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.target.classList.contains('flex')) {
+          setTimeout(() => mutation.target.classList.remove('translate-y-full'), 50);
+        } else {
+          mutation.target.classList.add('translate-y-full');
+        }
+      });
+    });
+    observer.observe(adminPanel, { attributes: true, attributeFilter: ['class'] });
+  }
 
   // Netlify Identity Handlers
   if (window.netlifyIdentity) {
