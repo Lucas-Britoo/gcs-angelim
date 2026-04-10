@@ -321,7 +321,7 @@ function renderPublicSheet(gcs) {
   });
 
   const listHtml = gcs.map(gc => {
-    return `<div class="bg-white border text-left border-gray-100 p-3.5 rounded-2xl shadow-sm hover:shadow-md transition-shadow active:bg-gray-50 cursor-pointer" onclick="window.flyToGC(${gc.id})">
+    return `<div class="gc-card bg-white border text-left border-gray-100 p-3.5 rounded-2xl shadow-sm hover:shadow-md transition-shadow active:bg-gray-50 cursor-pointer" data-id="${gc.id}">
         <h4 class="font-black text-brand-dark uppercase tracking-tight text-[12px] mb-1 drop-shadow-sm">${sanitize(gc.nome)}</h4>
         <p class="text-[11px] text-gray-500 line-clamp-1 mb-1 font-semibold">${sanitize(gc.bairro)}</p>
         <p class="text-[10px] text-gray-400 capitalize"><span class="font-bold text-gray-300 uppercase tracking-widest">Líder: </span> ${sanitize(gc.lider)}</p>
@@ -330,20 +330,26 @@ function renderPublicSheet(gcs) {
 
   container.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-1 gap-3">${listHtml}</div>`;
 
-  window.flyToGC = (id) => {
-    const target = globalGCs.find(g => g.id === id);
-    if(target && target._leafletMarker && target.lat) {
-      if(window.innerWidth < 768) {
-        isSheetOpen = false;
-        sheet.classList.add('translate-y-[calc(100%-55px)]');
-        sheet.classList.remove('translate-y-0');
+  // Adicionando evento de forma segura (CSP Compliant) sem usar onclick no html
+  const cards = container.querySelectorAll('.gc-card');
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const id = parseInt(card.getAttribute('data-id'));
+      const target = globalGCs.find(g => g.id === id);
+      
+      if(target && target._leafletMarker && target.lat) {
+        if(window.innerWidth < 768) {
+          isSheetOpen = false;
+          sheet.classList.add('translate-y-[calc(100%-55px)]');
+          sheet.classList.remove('translate-y-0');
+        }
+        map.flyTo([parseFloat(target.lat), parseFloat(target.lng)], 16, { duration: 1.2 });
+        setTimeout(() => target._leafletMarker.openPopup(), 1200);
+      } else {
+        showError("Este local não possui coordenada física no mapa.");
       }
-      map.flyTo([parseFloat(target.lat), parseFloat(target.lng)], 16, { duration: 1.2 });
-      setTimeout(() => target._leafletMarker.openPopup(), 1200);
-    } else {
-      showError("Este local não possui coordenada física no mapa.");
-    }
-  };
+    });
+  });
 }
 
 /**
