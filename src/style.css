@@ -77,3 +77,28 @@ body {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: #9ca3af; 
 }
+
+/* --- FIX: Centralização do Login Netlify Identity --- */
+/* Garante que o modal de login não fique "perdido" em telas de celular */
+iframe#netlify-identity-widget {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 95% !important;
+  max-width: 400px !important;
+  height: 90vh !important;
+  max-height: 550px !important;
+  z-index: 99999 !important;
+  position: fixed !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ajuste para quando o teclado do celular subir em telas muito pequenas */
+@media (max-height: 500px) {
+  iframe#netlify-identity-widget {
+    height: 100vh !important;
+    top: 0 !important;
+    transform: translate(-50%, 0) !important;
+  }
+}
