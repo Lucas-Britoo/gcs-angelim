@@ -1,16 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tipografia Adaptativa e Reset de Safe Area */
+:root {
+  /* Escala dinâmica: garante legibilidade automática em telas pequenas e grandes */
+  font-size: clamp(14px, 1vw + 10px, 18px);
+}
 
-/* Mapa ocupará todo o fundo */
 body {
   margin: 0;
   padding: 0;
   background-color: #f9fafb;
 }
 
+/* --- SUPORTE A SAFE AREAS (iOS Notch / Home Bar) --- */
+#main-header {
+  /* Distância adaptável: no iPhone X+ usa o recuo do sistema, no resto usa 1rem */
+  top: max(1rem, env(safe-area-inset-top)) !important;
+}
+
+#public-sheet {
+  /* Garante que o conteúdo da gaveta não fique atrás da 'Home Bar' do iOS */
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+}
+
+#admin-panel {
+  /* Painel admin também respeita o Notch quando em modo mobile */
+  top: max(1rem, env(safe-area-inset-top));
+}
+
 #map-container {
-  /* Evita que elementos da interface sumam no Leaflet */
   z-index: 10;
 }
 
@@ -20,6 +36,8 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
   border-radius: 0.75rem !important;
   overflow: hidden;
+  /* Desvia o controle de zoom da safe area lateral se necessário */
+  margin-right: max(10px, env(safe-area-inset-right)) !important;
 }
 
 .leaflet-control-zoom-in, 
@@ -41,26 +59,11 @@ body {
 
 .custom-popup .leaflet-popup-content {
   margin: 0;
+  font-size: 0.85rem;
 }
 
 .custom-popup .leaflet-popup-tip {
   background: rgba(255, 255, 255, 0.98);
-}
-
-/* Identidade Netlify: Estilizando o botão nativo */
-.identity-wrapper .netlify-identity-button {
-  background: transparent !important;
-  color: #171717 !important;
-  font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  border-radius: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  transition: all 0.3s;
-}
-
-.identity-wrapper .netlify-identity-button:hover {
-  background: #f3f4f6 !important;
 }
 
 /* Scrollbar Minimalista para o Admin */
@@ -83,10 +86,8 @@ iframe#netlify-identity-widget {
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: 95% !important;
-  max-width: 400px !important;
-  height: 90vh !important;
-  max-height: 550px !important;
+  width: min(95%, 400px) !important;
+  height: min(90vh, 550px) !important;
   z-index: 99999 !important;
   position: fixed !important;
 }
