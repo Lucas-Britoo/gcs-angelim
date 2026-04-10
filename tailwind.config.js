@@ -13,6 +13,9 @@ export default {
           dark: '#0a0a0a',   // Preto quase absoluto
           accent: '#404040', // Base para hover e elementos secundários
         }
+      },
+      fontFamily: {
+        sans: ['"Inter"', 'sans-serif'],
       }
     },
   },

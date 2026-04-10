@@ -60,6 +60,23 @@ function initMap() {
     
     markersLayer.addTo(map);
 
+    // Botão de Localização (GPS)
+    const gpsControl = L.control({ position: 'bottomright' });
+    gpsControl.onAdd = function() {
+      const btn = L.DomUtil.create('div', 'mb-24 md:mb-2 mr-2 pointer-events-auto');
+      btn.innerHTML = `<button class="bg-white text-brand-dark p-3.5 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.2)] hover:bg-gray-50 active:scale-95 transition-all border border-gray-100" title="Ver Minha Localização" onclick="window.locateUser()"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18A6 6 0 1012 6a6 6 0 000 12z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 22v-4M12 2v4M22 12h-4M2 12h4"></path></svg></button>`;
+      return btn;
+    };
+    gpsControl.addTo(map);
+
+    window.locateUser = () => {
+      if(userLocation) {
+        map.flyTo([userLocation.lat, userLocation.lng], 15, { animate: true, duration: 1 });
+      } else {
+        showError("Carregando sua localização ou permissão de GPS negada.");
+      }
+    };
+
     // Tentar capturar geolocalização do usuário
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -174,7 +191,16 @@ function renderGCMarkers(gcs) {
       </div>
     `;
 
-    const marker = L.marker(coords).bindPopup(popupContent);
+    // Ícone Premium Customizado com Logo
+    const brandIcon = L.divIcon({
+      className: 'bg-transparent border-0',
+      html: `<div class="w-11 h-11 bg-brand-dark rounded-full border-2 border-white shadow-xl flex items-center justify-center overflow-hidden active:scale-90 transition-transform"><img src="/logo.svg" class="w-10 h-10 object-cover mt-0.5 ml-0.5"></div>`,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+      popupAnchor: [0, -22]
+    });
+
+    const marker = L.marker(coords, { icon: brandIcon }).bindPopup(popupContent);
     gc._leafletMarker = marker; // Salvando referência para a Pesquisa
     marker.addTo(markersLayer);
   });
@@ -264,11 +290,59 @@ async function fetchGCs() {
       globalGCs = data; // Guarda pro auto-complete
       renderGCMarkers(data);
       setUpSearch();
+      renderPublicSheet(data);
     }
   } catch (error) {
     console.error("Fetch falhou", error);
     showError("Erro ao carregar os dados dos GCs.");
   }
+}
+
+/**
+ * Renderiza Gaveta Pública de GCs
+ */
+function renderPublicSheet(gcs) {
+  const container = document.getElementById('public-gc-list');
+  const sheet = document.getElementById('public-sheet');
+  const handle = document.getElementById('sheet-handle');
+  if(!container || !sheet) return;
+
+  let isSheetOpen = false;
+  handle.addEventListener('click', () => {
+    isSheetOpen = !isSheetOpen;
+    if(isSheetOpen) {
+      sheet.classList.remove('translate-y-[calc(100%-55px)]');
+      sheet.classList.add('translate-y-0');
+    } else {
+      sheet.classList.add('translate-y-[calc(100%-55px)]');
+      sheet.classList.remove('translate-y-0');
+    }
+  });
+
+  const listHtml = gcs.map(gc => {
+    return `<div class="bg-white border text-left border-gray-100 p-3.5 rounded-2xl shadow-sm hover:shadow-md transition-shadow active:bg-gray-50 cursor-pointer" onclick="window.flyToGC(${gc.id})">
+        <h4 class="font-black text-brand-dark uppercase tracking-tight text-[12px] mb-1 drop-shadow-sm">${sanitize(gc.nome)}</h4>
+        <p class="text-[11px] text-gray-500 line-clamp-1 mb-1 font-semibold">${sanitize(gc.bairro)}</p>
+        <p class="text-[10px] text-gray-400 capitalize"><span class="font-bold text-gray-300 uppercase tracking-widest">Líder: </span> ${sanitize(gc.lider)}</p>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-1 gap-3">${listHtml}</div>`;
+
+  window.flyToGC = (id) => {
+    const target = globalGCs.find(g => g.id === id);
+    if(target && target._leafletMarker && target.lat) {
+      if(window.innerWidth < 768) {
+        isSheetOpen = false;
+        sheet.classList.add('translate-y-[calc(100%-55px)]');
+        sheet.classList.remove('translate-y-0');
+      }
+      map.flyTo([parseFloat(target.lat), parseFloat(target.lng)], 16, { duration: 1.2 });
+      setTimeout(() => target._leafletMarker.openPopup(), 1200);
+    } else {
+      showError("Este local não possui coordenada física no mapa.");
+    }
+  };
 }
 
 /**
