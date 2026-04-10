@@ -49,8 +49,8 @@ let markersLayer = new L.LayerGroup();
 
 function initMap() {
   try {
-    // Coordenadas centrais padrão (fallback)
-    map = L.map('map').setView([-2.53, -44.30], 12);
+    // Coordenadas centrais padrão Parnaíba (PI)
+    map = L.map('map').setView([-2.909, -41.767], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -100,45 +100,73 @@ function renderGCMarkers(gcs) {
   markersLayer.clearLayers();
   
   gcs.forEach(gc => {
-    // Sanitizando todos os campos
+    // Sanitizando todos os campos estendidos
     const name = sanitize(gc.nome);
-    const leader = sanitize(gc.lider);
+    const dia = sanitize(gc.dia);
     const time = sanitize(gc.horario);
-    let coords = [];
+    const bairro = sanitize(gc.bairro);
+    const endereco = sanitize(gc.endereco);
+    const leader = sanitize(gc.lider);
+    const contato = sanitize(gc.contato);
+    const obs = gc.obs ? sanitize(gc.obs) : '';
     
+    let coords = [];
     try {
+      if (gc.lat === null || gc.lng === null) throw new Error(); // Ex. GC Online
       coords = [parseFloat(gc.lat), parseFloat(gc.lng)];
       if (isNaN(coords[0]) || isNaN(coords[1])) throw new Error();
     } catch(e) {
-      return; // Pula marker inválido
+      return; // Pula marker inválido (ex: GCs via Meet sem lat/lng)
     }
 
     let distanceText = '';
     if (userLocation) {
       const dist = calculateDistance(userLocation.lat, userLocation.lng, coords[0], coords[1]);
-      distanceText = `<p class="text-sm mt-1 text-gray-500"><strong>Distância:</strong> ${dist.toFixed(1)} km</p>`;
+      distanceText = `<p class="text-xs text-brand-accent bg-gray-100 rounded px-2 py-1 inline-flex items-center shadow-sm w-fit mt-1"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <b>${dist.toFixed(1)} km</b> distante</p>`;
     }
 
     const navUrl = sanitize(`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`);
+    const wppLink = `https://wa.me/55${contato.replace(/\D/g, "")}`;
 
-    // Construção segura premium google maps style
+    // Construção segura premium google maps style com campos novos
     const popupContent = `
-      <div class="custom-popup min-w-[220px]">
-        <div class="bg-brand-dark p-3 rounded-t-2xl">
-          <h3 class="font-bold text-base text-white leading-tight">${name}</h3>
-          ${distanceText ? `<p class="text-xs text-brand-light opacity-90 mt-1">📍 ${dist.toFixed(1)} km de você</p>` : ''}
+      <div class="custom-popup min-w-[240px]">
+        <div class="bg-brand-dark p-3 rounded-t-2xl border-b border-brand-accent">
+          <h3 class="font-bold text-base text-white leading-tight uppercase tracking-tight">${name}</h3>
+          ${distanceText}
         </div>
-        <div class="p-4 bg-white rounded-b-2xl">
-          <div class="flex flex-col gap-1 mb-4">
-            <p class="text-sm text-gray-800 flex items-center gap-2">
-              <span class="font-bold text-gray-400">Líder:</span> ${leader}
+        <div class="px-4 py-3 bg-white rounded-b-2xl">
+          <div class="flex flex-col gap-1.5 mb-3 text-[13px]">
+            
+            <p class="text-gray-800 leading-tight">
+              <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Quando</span> 
+              ${dia}, às ${time}
             </p>
-            <p class="text-sm text-gray-800 flex items-center gap-2">
-              <span class="font-bold text-gray-400">Quando:</span> ${time}
+
+            <p class="text-gray-800 leading-tight mt-1">
+              <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Onde</span> 
+              <span class="font-semibold text-brand-dark">${bairro}</span><br>
+              <span class="text-gray-500 italic">${endereco}</span>
             </p>
+
+            <p class="text-gray-800 leading-tight mt-1">
+              <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Liderança</span> 
+              ${leader}
+            </p>
+            
+            <p class="text-gray-800 leading-tight">
+              <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Contato</span> 
+              <a href="${wppLink}" target="_blank" class="text-green-600 hover:text-green-700 font-bold flex items-center hover:underline cursor-pointer">
+                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 001.333 4.993L2 22l5.233-1.237a9.994 9.994 0 004.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0012.012 2zm5.796 14.34c-.241.677-1.192 1.3-1.637 1.339-.427.039-1.272.183-3.64-1.393-2.844-1.894-4.664-5.006-4.805-5.197-.139-.193-1.147-1.545-1.147-2.946 0-1.402.723-2.096.979-2.366.255-.269.554-.338.735-.338.181 0 .363.003.521.01.168.007.391-.065.611.468.225.545.728 1.782.793 1.916.064.135.105.293.023.456-.081.161-.122.256-.242.39-.12.135-.251.29-.36.402-.121.121-.249.255-.109.497.139.24 .618.99 1.296 1.597.876.784 1.6026 1.028 1.843 1.15.241.12.383.099.525-.065.143-.162.617-.714.782-.96.164-.244.327-.202.551-.12.224.081 1.416.666 1.658.788.242.12.404.181.463.282.059.101.059.585-.182 1.261z"/></svg>
+                ${contato}
+              </a>
+            </p>
+
+            ${obs ? `<div class="bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold px-2 py-1 rounded w-full mt-1.5"><strong class="uppercase text-amber-600 block text-[9px] min-w-full">Observação</strong>${obs}</div>` : ''}
+
           </div>
           <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-brand-dark text-white py-2.5 rounded-lg text-sm font-bold hover:bg-brand-accent transition-all shadow-md active:scale-95">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-3 5.447 2.724A1 1 0 0121 7.618v10.764a1 1 0 01-1.447.894L15 17l-6 3z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7v13M15 4v13"></path></svg>
             ROTAS
           </a>
         </div>
