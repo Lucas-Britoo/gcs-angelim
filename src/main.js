@@ -47,6 +47,7 @@ let map = null;
 let userLocation = null;
 let markersLayer = new L.LayerGroup();
 let globalGCs = []; // Guarda a lista pra barra de pesquisa
+let hasFetchedInitialData = false; // Flag para bloquear dupla chamada
 
 function initMap() {
   try {
@@ -219,14 +220,18 @@ function setUpSearch() {
     if (!input.contains(e.target) && !resultsBox.contains(e.target)) resultsBox.classList.add('hidden');
   });
 
-  input.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase().trim();
-    if (term.length < 2) {
-      resultsBox.classList.add('hidden');
-      return;
-    }
+  let debounceTimer;
 
-    const filtered = globalGCs.filter(gc => {
+  input.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const term = e.target.value.toLowerCase().trim();
+      if (term.length < 2) {
+        resultsBox.classList.add('hidden');
+        return;
+      }
+
+      const filtered = globalGCs.filter(gc => {
       const nomeSafe = gc.nome ? gc.nome.toLowerCase() : '';
       const bairroSafe = gc.bairro ? gc.bairro.toLowerCase() : '';
       const liderSafe = gc.lider ? gc.lider.toLowerCase() : '';
@@ -266,7 +271,11 @@ function setUpSearch() {
 /**
  * Fetch Data via Proxy Netlify
  */
-async function fetchGCs() {
+async function fetchGCs(forceSync = false) {
+  // Evita carregar duas vezes (GPS Boot vs Identity Boot)
+  if (hasFetchedInitialData && !forceSync) return;
+  hasFetchedInitialData = true;
+
   try {
     const defaultHeaders = {
       'Content-Type': 'application/json'
@@ -309,8 +318,10 @@ function renderPublicSheet(gcs) {
   if(!container || !sheet) return;
 
   let isSheetOpen = false;
-  handle.addEventListener('click', () => {
-    isSheetOpen = !isSheetOpen;
+
+  const toggleSheet = (open) => {
+    isSheetOpen = open;
+    sheet.style.transform = ''; // Limpa rastros de gesto inline
     if(isSheetOpen) {
       sheet.classList.remove('translate-y-[calc(100%-55px)]');
       sheet.classList.add('translate-y-0');
@@ -318,6 +329,30 @@ function renderPublicSheet(gcs) {
       sheet.classList.add('translate-y-[calc(100%-55px)]');
       sheet.classList.remove('translate-y-0');
     }
+  };
+
+  handle.addEventListener('click', () => toggleSheet(!isSheetOpen));
+
+  // 📱 Injeção de Gestos Físicos Nativos (Arrastar Tela)
+  let startY = 0, currentY = 0;
+  handle.addEventListener('touchstart', (e) => { 
+    startY = e.touches[0].clientY; 
+    sheet.style.transition = 'none'; // Corta engine de animação CSS temporariamente
+  }, {passive: true});
+  
+  handle.addEventListener('touchmove', (e) => {
+    currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    if(diff > 0 && isSheetOpen) sheet.style.transform = `translateY(${diff}px)`; // Empurrando pra baixo
+    else if(diff < 0 && !isSheetOpen) sheet.style.transform = `translateY(calc(100% - 55px + ${diff}px))`; // Puxando pra cima
+  }, {passive: true});
+  
+  handle.addEventListener('touchend', () => {
+    sheet.style.transition = ''; // Libera o CSS de volta
+    const diff = currentY - startY;
+    if (diff > 50 && isSheetOpen) toggleSheet(false);
+    else if (diff < -50 && !isSheetOpen) toggleSheet(true);
+    else toggleSheet(isSheetOpen); // Se toque acidental, retrocede estado
   });
 
   const listHtml = gcs.map(gc => {
@@ -394,8 +429,8 @@ function handleAuthChange(user) {
       
       adminContent.innerHTML = html; // Usamos variáveis seguras e lógica controlada
 
-      // Re-fetch points passando o token nas headers
-      fetchGCs();
+      // Re-fetch points forçando atualização ao logar
+      fetchGCs(true);
     }
   } else {
     // Reset layout
@@ -415,6 +450,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Netlify Identity Handlers
   if (window.netlifyIdentity) {
+    // Inicialização manual obrigatória para botões customizados
+    window.netlifyIdentity.init();
+    
     window.netlifyIdentity.on("init", user => handleAuthChange(user));
     window.netlifyIdentity.on("login", user => {
       window.netlifyIdentity.close();

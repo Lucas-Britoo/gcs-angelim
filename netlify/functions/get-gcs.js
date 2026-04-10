@@ -1,24 +1,17 @@
 // Arquivo Proxy Seguro rodando em Node.js (AWS Lambda via Netlify)
-// Função busca GCs do Supabase e retorna JSON estruturado.
+// Função busca GCs do Supabase e retorna JSON estruturado com Otimização de Edge Cache.
 
 exports.handler = async (event, context) => {
   try {
-    // Zero-Trust: Essa Lambda esconde as chaves do frontend, protegendo o DB.
+    // 🛡️ Zero-Trust Security: Prioriza chaves injetadas pela Netlify invisivelmente,
+    // mas faz fallback pras suas chaves caso esqueça de setá-las no painel.
+    const SUPABASE_URL = process.env.SUPABASE_URL || "https://ubxrhqehclgrpyzenuum.supabase.co";
+    const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || "sb_secret__iSvdogTgwz68bEu4z6qpg_L9RcBzps";
     
-    // A chave provida pela configuração do Supabase
-    const SUPABASE_URL = "https://ubxrhqehclgrpyzenuum.supabase.co";
-    const SUPABASE_KEY = "sb_secret__iSvdogTgwz68bEu4z6qpg_L9RcBzps";
-    
-    // Prevenção caso a string fornecida não venha com o protocolo
     let endpoint = SUPABASE_URL.trim();
-    if (!endpoint.startsWith("http")) {
-      endpoint = "https://" + endpoint;
-    }
-    
-    // Anexa a query para consultar todos os dados da tabela 'gcs'
-    endpoint += "/rest/v1/gcs?select=*";
+    if (!endpoint.startsWith("http")) endpoint = "https://" + endpoint;
+    endpoint += "/rest/v1/gcs?select=*&order=id.asc"; // Garante ordenamento crescente por ID
 
-    // Dispara requisição HTTP Server-side para o PostgreSQL
     const res = await fetch(endpoint, {
       method: "GET",
       headers: {
@@ -28,30 +21,23 @@ exports.handler = async (event, context) => {
       }
     });
 
-    if (!res.ok) {
-      throw new Error(`Supabase Error Status: ${res.status}`);
-    }
-
+    if (!res.ok) throw new Error(`Supabase Error Status: ${res.status}`);
     const rawData = await res.json();
 
-    // Sanitização e formatação estruturada
     const sanitizedPayload = rawData.map(item => ({
-      id: item.id,
-      nome: item.nome,
-      dia: item.dia,
-      horario: item.horario,
-      bairro: item.bairro,
-      endereco: item.endereco,
-      lider: item.lider,
-      contato: item.contato,
-      obs: item.obs,
-      lat: item.lat,
-      lng: item.lng
+      id: item.id, nome: item.nome, dia: item.dia, horario: item.horario, 
+      bairro: item.bairro, endereco: item.endereco, lider: item.lider, 
+      contato: item.contato, obs: item.obs, lat: item.lat, lng: item.lng
     }));
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        // ⚡ Turbo Boost: Instruimos a CDN da Netlify a guardar o resultado por 5 minutos
+        // Qualquer milhão de visitas nesses 5 minutos não batem no banco de dados.
+        'Cache-Control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=600'
+      },
       body: JSON.stringify(sanitizedPayload)
     };
 
@@ -59,7 +45,7 @@ exports.handler = async (event, context) => {
     console.error("Supabase Proxy Error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Erro interno: Falha de conexão com Supabase. Verifique se a tabela 'gcs' existe e possui os dados previstos." })
+      body: JSON.stringify({ error: "Erro na conexão com Supabase ou tabela vazia." })
     };
   }
 };
