@@ -23,20 +23,20 @@ export function renderDashboard(gcs, container) {
 
   container.innerHTML = `
     <!-- 🟢 SEÇÃO 1: MÉTRICAS E INSIGHTS -->
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <div class="bg-brand-dark text-white p-5 rounded-3xl shadow-xl relative overflow-hidden">
-        <span class="block text-[9px] uppercase font-black text-brand-accent mb-1 tracking-widest">Total de GCs</span>
-        <span class="text-4xl font-black">${totalGCs}</span>
+    <div class="grid grid-cols-2 gap-2 md:gap-3 mb-6">
+      <div class="bg-brand-dark text-white p-4 md:p-5 rounded-3xl shadow-xl relative overflow-hidden">
+        <span class="block text-[8px] md:text-[9px] uppercase font-black text-brand-accent mb-1 tracking-widest">Total GCs</span>
+        <span class="text-3xl md:text-4xl font-black">${totalGCs}</span>
       </div>
-      <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
-        <span class="block text-[9px] uppercase font-black text-gray-400 mb-1 tracking-widest">Bairros</span>
-        <span class="text-4xl font-black text-gray-900">${Object.keys(districtCounts).length}</span>
+      <div class="bg-white p-4 md:p-5 rounded-3xl border border-gray-100 shadow-sm">
+        <span class="block text-[8px] md:text-[9px] uppercase font-black text-gray-400 mb-1 tracking-widest">Bairros</span>
+        <span class="text-3xl md:text-4xl font-black text-gray-900">${Object.keys(districtCounts).length}</span>
       </div>
     </div>
 
     <!-- 📊 RANKING RÁPIDO -->
-    <div class="bg-gray-50/50 p-5 rounded-3xl border border-gray-100 mb-8">
-      <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 text-center">Densidade por Região</h4>
+    <div class="bg-gray-50/50 p-4 md:p-5 rounded-3xl border border-gray-100 mb-8">
+      <h4 class="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 text-center">Densidade por Região</h4>
       <div class="space-y-4">
         ${topDistricts.map(([name, count]) => {
           const percent = (count / maxCount) * 100;

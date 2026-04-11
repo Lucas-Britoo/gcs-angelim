@@ -213,7 +213,7 @@ window.openGCEditor = (idOrGc = null) => {
 document.getElementById('close-editor').onclick = () => {
   document.getElementById('gc-editor').classList.add('hidden');
   document.getElementById('admin-content').classList.remove('hidden');
-  document.getElementById('admin-title').textContent = "Painel Portal";
+  document.getElementById('admin-title').textContent = "Painel";
 };
 
 document.getElementById('gc-form').onsubmit = async (e) => {
