@@ -13,22 +13,27 @@ if (!isSupabaseConfigured) {
 
 // --- ATIVAÇÃO DO MOTOR REALTIME (v3.0.0) ---
 if (supabase) {
-  supabase
+  const channel = supabase
     .channel('public:gcs')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'gcs' }, (payload) => {
-      console.log('📡 Mudança detectada no banco:', payload.eventType);
-      fetchGCs(); // Atualiza tudo automaticamente
+      console.log('📡 Sincronia Realtime:', payload.eventType);
+      fetchGCs();
     })
-    .subscribe();
+    .subscribe((status) => {
+      console.log('🔌 Status do Canal:', status);
+      if (status === 'CHANNEL_ERROR') {
+        console.warn('⚠️ Erro no Realtime. Verifique se a Replication está ativa no Dashboard.');
+      }
+    });
 }
 
 // --- CONFIGURAÇÕES & ESTADO ---
 const APP_CONFIG = {
-  VERSION: '1.9.0',
-  MAP_CENTER: [-2.909, -41.767],
-  DEFAULT_ZOOM: 13,
+  VERSION: '3.2.0',
+  MAP_CENTER: [-2.909, -41.776],
+  DEFAULT_ZOOM: 14,
   FOCUS_ZOOM: 16,
-  CACHE_KEY: 'gcs_cache_v1.9'
+  CACHE_KEY: 'angelim_gcs_cache_v3'
 };
 
 const State = {
@@ -278,15 +283,22 @@ window.deleteGC = async (id) => {
   if (!confirm("Tem certeza que deseja apagar este grupo permanentemente?")) return;
   
   try {
-    const { error } = await supabase?.from('gcs').delete().eq('id', id);
-    if (error) throw error;
+    const numericId = Number(id);
+    console.log("🗑️ Tentando apagar ID:", numericId);
     
-    // Invalidação de Cache
-    localStorage.removeItem('angelim_gcs_cache');
+    const { error } = await supabase?.from('gcs').delete().eq('id', numericId);
+    if (error) {
+       console.error("❌ Erro Supabase no Delete:", error);
+       throw error;
+    }
+    
+    // Invalidação de Cache Total (v3.2)
+    localStorage.removeItem('angelim_gcs_cache_v3');
     showToast("Grupo removido!", "success");
     fetchGCs();
   } catch (err) {
-    showToast(`Erro ao apagar: ${err.message}`);
+    showToast(`Erro ao apagar: ${err.message || 'Verifique sua conexão'}`);
+    console.error(err);
   }
 };
 
