@@ -123,22 +123,48 @@ function renderGCMarkers(gcs) {
   });
 }
 
+// --- UX: SKELETONS & NAVEGAÇÃO (v4.1.0) ---
+function renderSkeletons() {
+  const container = document.getElementById('public-gc-list');
+  if (!container) return;
+  container.innerHTML = Array(4).fill(0).map(() => `
+    <div class="bg-white/50 rounded-3xl p-4 border border-gray-100 flex gap-4 animate-pulse">
+      <div class="w-16 h-16 skeleton rounded-2xl flex-shrink-0"></div>
+      <div class="flex-1 space-y-3">
+        <div class="h-4 skeleton w-3/4"></div>
+        <div class="h-3 skeleton w-1/2"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.openDirections = (lat, lng) => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const gMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  const wazeUrl = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+  const appleUrl = `http://maps.apple.com/?daddr=${lat},${lng}`;
+
+  if (confirm("Deseja abrir no Waze?")) {
+    window.open(wazeUrl, '_blank');
+  } else if (isIOS && confirm("Deseja abrir no Apple Maps?")) {
+    window.open(appleUrl, '_blank');
+  } else {
+    window.open(gMapsUrl, '_blank');
+  }
+};
+
 function getPopupTemplate(gc) {
   const name = sanitize(gc.nome);
   const wppLink = `https://wa.me/55${(gc.contato || "").replace(/\D/g, "")}`;
-  const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${gc.lat},${gc.lng}`;
   return `
-    <div class="custom-card w-full overflow-hidden bg-white relative">
-      ${gc.foto_url ? `<img src="${gc.foto_url}" class="w-full h-32 object-cover border-b border-gray-100">` : `<div class="bg-brand-dark h-3 p-4"></div>`}
-      <div class="p-4">
-        <h3 class="font-black text-gray-900 text-sm uppercase tracking-tight mb-2">${name}</h3>
-        <div class="space-y-2 mb-4 text-[11px] font-semibold text-gray-600">
-          <p class="flex items-center gap-2">📍 ${sanitize(gc.bairro)}</p>
-          <p class="flex items-center gap-2">⏰ ${sanitize(gc.dia)}, ${sanitize(gc.horario)}</p>
-        </div>
+    <div class="p-0 overflow-hidden rounded-3xl bg-white">
+      ${gc.foto_url ? `<img src="${gc.foto_url}" class="w-full h-32 object-cover">` : '<div class="w-full h-24 bg-brand-light flex items-center justify-center font-bold text-white uppercase text-xs">Sem Foto</div>'}
+      <div class="p-5">
+        <span class="text-[9px] font-black uppercase tracking-widest text-brand-dark opacity-60">${gc.bairro || "Sem Bairro"}</span>
+        <h3 class="text-base font-black text-gray-900 leading-tight mb-4">${name}</h3>
         <div class="flex flex-col gap-2">
           <a href="${wppLink}" target="_blank" class="w-full bg-green-600 text-white py-2.5 rounded-xl text-[10px] font-black uppercase text-center shadow-lg active:scale-95 transition-all">Quero Participar</a>
-          <a href="${navUrl}" target="_blank" class="w-full border border-gray-200 text-gray-400 py-2.5 rounded-xl text-[10px] font-black uppercase text-center active:bg-gray-50 transition-all">Ver no Maps</a>
+          <button onclick="window.openDirections(${gc.lat}, ${gc.lng})" class="w-full border border-gray-200 text-gray-500 py-2.5 rounded-xl text-[10px] font-black uppercase text-center active:bg-gray-50 transition-all font-sans">Como Chegar 🚗</button>
         </div>
       </div>
     </div>`;
@@ -147,13 +173,18 @@ function getPopupTemplate(gc) {
 async function fetchGCs() {
   const cached = localStorage.getItem(APP_CONFIG.CACHE_KEY);
   if (cached && !State.hasFetched) {
-    State.globalGCs = JSON.parse(cached);
-    renderGCMarkers(State.globalGCs);
-    renderPublicSheet(State.globalGCs);
+    const data = JSON.parse(cached);
+    State.globalGCs = data;
+    renderGCMarkers(data);
+    renderPublicSheet(data);
+  } else {
+    renderSkeletons(); // Mostra skeletons se não houver cache inicial
   }
+  
   try {
     const { data, error } = await supabase?.from('gcs').select('*') || { data: null, error: { message: 'Supabase offline' } };
     if (error) throw error;
+    
     if (JSON.stringify(data) !== cached) {
       State.globalGCs = data;
       localStorage.setItem(APP_CONFIG.CACHE_KEY, JSON.stringify(data));
@@ -168,17 +199,32 @@ async function fetchGCs() {
 function renderPublicSheet(gcs) {
   const container = document.getElementById('public-gc-list');
   if (!container) return;
-  container.innerHTML = gcs.map(gc => `
-    <div onclick="window.focusGC('${gc.id}')" class="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm mb-3 cursor-pointer active:scale-95 transition-all hover:border-brand-dark group">
-      <div class="flex items-center justify-between">
-        <div>
-          <h4 class="font-black text-xs uppercase text-brand-dark group-hover:text-blue-600">${sanitize(gc.nome)}</h4>
-          <p class="text-[10px] text-gray-400">${sanitize(gc.bairro)}</p>
+  
+  if (gcs.length === 0) {
+    container.innerHTML = `<div class="text-center py-20"><p class="text-gray-400 text-sm">Nenhum GC encontrado.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = gcs.map(gc => {
+    return `
+      <div class="bg-white rounded-3xl p-4 border border-gray-100 flex gap-4 hover:shadow-md transition-shadow active:scale-[0.98] transition-all cursor-pointer" onclick="window.focusGC('${gc.id}')">
+        <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-brand-light">
+          ${gc.foto_url ? `<img src="${gc.foto_url}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-white font-bold text-xs font-black">GC</div>`}
         </div>
-        <svg class="w-4 h-4 text-gray-200 group-hover:text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start mb-1">
+            <h4 class="font-black text-gray-900 text-sm truncate uppercase tracking-tight">${sanitize(gc.nome)}</h4>
+            <span class="text-[8px] font-bold bg-gray-50 text-gray-400 px-2 py-0.5 rounded-full uppercase truncate">${sanitize(gc.bairro)}</span>
+          </div>
+          <p class="text-[10px] text-gray-500 font-semibold mb-3">${sanitize(gc.dia)}, ${sanitize(gc.horario)}</p>
+          <div class="flex gap-2">
+            <button onclick="event.stopPropagation(); window.openDirections(${gc.lat}, ${gc.lng})" class="flex-1 bg-gray-50 text-gray-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-gray-100 transition-all">Rotas 🚗</button>
+            <a onclick="event.stopPropagation();" href="https://wa.me/55${(gc.contato || "").replace(/\D/g, "")}" target="_blank" class="flex-1 bg-green-50 text-green-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-green-100 transition-all items-center justify-center flex gap-1">Zap 💬</a>
+          </div>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 window.focusGC = (id) => {
@@ -393,36 +439,73 @@ async function updateUI(session) {
   }
 }
 
+// --- MOTOR DE GESTOS SWIPE (v4.0.0) ---
+function initSwipe(handleId, targetId, activeClass) {
+  const handle = document.getElementById(handleId);
+  const target = document.getElementById(targetId);
+  if (!handle || !target) return;
+
+  let startY = 0;
+  let currentY = 0;
+
+  handle.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  handle.addEventListener('touchmove', (e) => {
+    currentY = e.touches[0].clientY;
+  }, { passive: true });
+
+  handle.addEventListener('touchend', () => {
+    const diff = startY - currentY;
+    if (Math.abs(diff) < 30) return; // Evita cliques acidentais
+
+    if (diff > 50) { // Swipe UP
+      target.classList.add(activeClass);
+    } else if (diff < -50) { // Swipe DOWN
+      target.classList.remove(activeClass);
+    }
+  });
+
+  // Clique simples também funciona como fallback
+  handle.onclick = () => target.classList.toggle(activeClass);
+}
+
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
+  
+  // Inicializa Gestos Mobile
+  initSwipe('sheet-handle', 'public-sheet', 'drawer-active');
+  initSwipe('admin-handle', 'admin-panel', 'admin-active');
+
+  // Listeners de Login
   authForm.onsubmit = handleLogin;
   document.getElementById('login-trigger').onclick = () => authOverlay.classList.remove('hidden');
   authOverlay.onclick = (e) => { if (e.target === authOverlay) authOverlay.classList.add('hidden'); };
   
-  // Listener Único de Autenticação para evitar duplicidade
-  // --- MÉDIA: CLIQUE GALERIA E PREVIEW ---
+  // Media & Upload
   const dropzone = document.getElementById('photo-dropzone');
   const fileInput = document.getElementById('gc-photo-input');
-  const preview = document.getElementById('photo-preview');
-  const placeholder = document.getElementById('photo-placeholder');
+  if (dropzone && fileInput) {
+    dropzone.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const preview = document.getElementById('photo-preview');
+        const placeholder = document.getElementById('photo-placeholder');
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          preview.src = event.target.result;
+          preview.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }
 
-  dropzone.onclick = () => fileInput.click();
-
-  fileInput.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        preview.src = event.target.result;
-        preview.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // --- AUTOPREENCHIMENTO: GATILHOS (v3.1.0) ---
+  // Busca e Autopreenchimento
   const latField = document.getElementById('gc-lat');
   const lngField = document.getElementById('gc-lng');
   if (latField && lngField) {
@@ -430,7 +513,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lngField.onblur = handleAutoFill;
   }
 
-  // --- BUSCA PÚBLICA INTEGRADA (v3.2.3) ---
   const publicSearch = document.getElementById('public-search');
   if (publicSearch) {
     publicSearch.oninput = (e) => {
@@ -444,10 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  supabase?.auth.onAuthStateChange((event, session) => {
-    console.log("Auth Event:", event);
-    updateUI(session);
-  });
+  supabase?.auth.onAuthStateChange((event, session) => updateUI(session));
 });
 
 window.signOut = async () => { await supabase?.auth.signOut(); window.location.reload(); };
