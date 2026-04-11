@@ -228,8 +228,7 @@ document.getElementById('gc-form').onsubmit = async (e) => {
     contato: document.getElementById('gc-contato').value,
     endereco: document.getElementById('gc-address').value,
     lat: document.getElementById('gc-lat').value,
-    lng: document.getElementById('gc-lng').value,
-    atualizado_em: new Date()
+    lng: document.getElementById('gc-lng').value
   };
 
   try {
