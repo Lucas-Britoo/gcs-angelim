@@ -141,17 +141,16 @@ async function uploadPhoto(file, gcId) {
   const fileName = `${gcId}-${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `photos/${fileName}`;
 
-  const { data, error } = await supabase.storage
+  const { data: { user } } = await supabase?.auth.getUser() || { data: { user: null } };
+  const { data, error } = await supabase?.storage
     .from('gc-photos')
     .upload(filePath, compressedFile);
 
   if (error) throw error;
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('gc-photos')
-    .getPublicUrl(filePath);
+  const { data: urlData } = supabase?.storage.from('gc-photos').getPublicUrl(filePath) || { data: { publicUrl: null } };
 
-  return publicUrl;
+  return urlData.publicUrl;
 }
 
 
@@ -257,7 +256,7 @@ async function fetchGCs() {
   }
 
   try {
-    const { data, error } = await supabase.from('gcs').select('*');
+    const { data, error } = await supabase?.from('gcs').select('*') || { data: null, error: 'Configuração ausente' };
     if (error) throw error;
 
     // 2. Se mudou algo ou se não tinha cache, atualiza
@@ -317,11 +316,11 @@ authForm.addEventListener('submit', async (e) => {
 
   try {
     if (isLoginMode) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase?.auth.signInWithPassword({ email, password }) || { error: 'Configuração ausente' };
       if (error) throw error;
       showToast("Login realizado com sucesso!", "success");
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase?.auth.signUp({ email, password }) || { error: 'Configuração ausente' };
       if (error) throw error;
       showToast("Conta criada! Verifique seu e-mail.", "success");
     }
@@ -333,39 +332,37 @@ authForm.addEventListener('submit', async (e) => {
   }
 });
 
-function updateUI(session) {
+// Persistência de Sessão e UI
+async function updateUI(session) {
+  const loginBtn = document.getElementById('login-trigger');
   const adminPanel = document.getElementById('admin-panel');
-  const adminContent = document.getElementById('admin-content');
 
   if (session) {
-    authOverlay.classList.add('hidden');
+    loginBtn.innerHTML = `
+      <div class="w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center text-brand-dark font-black text-[10px] shadow-inner rotate-3 hover:rotate-0 transition-transform">
+        ${session.user.email.charAt(0).toUpperCase()}
+      </div>
+    `;
     adminPanel.classList.remove('hidden');
-    adminPanel.classList.remove('translate-y-full');
-    renderDashboard(globalGCs, adminContent);
-    fetchGCs(); // Garante dados atualizados
+    // Carregar dados admin
+    const { data } = await supabase?.from('gcs').select('*') || { data: [] };
+    renderDashboard(data, document.getElementById('admin-content'));
   } else {
+    loginBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
     adminPanel.classList.add('hidden');
-    adminPanel.classList.add('translate-y-full');
-    // Se não estiver logado, mostramos o mapa em modo espectador ou forçamos login?
-    // Vou forçar o overlay apenas se clicarem em 'Login' ou algo do tipo.
-    // Mas conforme o PRD, vamos deixar o mapa visível e o login opcional ou sob demanda.
   }
 }
 
-// Botão de login flutuante
-document.getElementById('login-trigger').addEventListener('click', () => {
-  authOverlay.classList.remove('hidden');
-});
-
 // Listener de Estado de Autenticação
-supabase.auth.onAuthStateChange((event, session) => {
+supabase?.auth.onAuthStateChange((event, session) => {
   updateUI(session);
 });
 
 // Logout
 window.signOut = async () => {
-    await supabase.auth.signOut();
-    showToast("Sessão encerrada", "success");
+  await supabase?.auth.signOut();
+  window.location.reload();
+  showToast("Sessão encerrada", "success");
 };
 
 /**
@@ -427,6 +424,7 @@ gcForm.onsubmit = async (e) => {
   const bairro = document.getElementById('gc-bairro').value;
   const lider = document.getElementById('gc-leader').value;
   const file = photoInput.files[0];
+  const gcData = { nome, bairro, lider };
 
   const submitBtn = document.getElementById('save-gc-btn');
   const uploadStatus = document.getElementById('upload-status');
@@ -442,10 +440,12 @@ gcForm.onsubmit = async (e) => {
       foto_url = await uploadPhoto(file, id);
       uploadStatus.classList.add('hidden');
     }
+    
+    gcData.foto_url = foto_url;
 
-    const { error } = await supabase.from('gcs').upsert({
-      id, nome, bairro, lider, foto_url
-    });
+    const { error } = id 
+      ? await supabase?.from('gcs').update(gcData).eq('id', id)
+      : await supabase?.from('gcs').insert([gcData]) || { error: 'Configuração ausente' };
 
     if (error) throw error;
 
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMap();
   
   // Verifica sessão inicial
-  supabase.auth.getSession().then(({ data: { session } }) => {
+  supabase?.auth.getSession().then(({ data: { session } }) => {
     updateUI(session);
   });
 });
