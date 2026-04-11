@@ -177,7 +177,8 @@ function renderGCMarkers(gcs) {
 
     const marker = L.marker(coords, { icon: brandIcon }).bindPopup(popupContent, {
       maxWidth: 280,
-      minWidth: 220,
+      minWidth: 280,
+      autoPanPadding: [100, 100],
       className: 'custom-popup'
     });
     gc._marker = marker;
@@ -192,7 +193,7 @@ function getPopupStyle(gc, distanceHtml) {
   const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${gc.lat},${gc.lng}`;
 
   return `
-    <div class="custom-popup w-full overflow-hidden rounded-[1.5rem] shadow-2xl bg-white relative">
+    <div class="custom-card w-full overflow-hidden bg-white relative">
       <!-- Botão Compartilhar -->
       <button onclick="window.shareGC('${name}', '${sanitize(gc.bairro)}')" class="absolute top-4 right-4 z-[10] bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/40 active:scale-90 transition-all border border-white/30">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>

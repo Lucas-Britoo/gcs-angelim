@@ -61,16 +61,17 @@ body {
 /* Ajusta o popup para o tema escuro/glass */
 .custom-popup .leaflet-popup-content-wrapper {
   background: white;
-  border-radius: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  padding: 0 !important; /* Remove o padding padrão do Leaflet */
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  padding: 0 !important;
   border: none;
   overflow: hidden;
+  width: 280px !important; /* LARGURA FIXA */
 }
 
 .custom-popup .leaflet-popup-content {
-  margin: 0 !important; /* Remove a margem padrão do Leaflet */
-  width: auto !important;
+  margin: 0 !important;
+  width: 280px !important; /* LARGURA FIXA */
   line-height: 1.4;
 }
 
