@@ -231,6 +231,31 @@ document.getElementById('close-editor').onclick = () => {
   document.getElementById('admin-title').textContent = "Painel";
 };
 
+// --- INTELIGÊNCIA GEOGRÁFICA: AUTOPREENCHIMENTO (v3.1.0) ---
+async function handleAutoFill() {
+  const lat = document.getElementById('gc-lat').value.trim();
+  const lng = document.getElementById('gc-lng').value.trim();
+  
+  if (lat && lng && lat.length > 5 && lng.length > 5) {
+    try {
+      showToast("Buscando endereço...", "success");
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+      const data = await res.json();
+      
+      if (data.address) {
+        const bairro = data.address.suburb || data.address.neighbourhood || data.address.village || data.address.town || "";
+        const road = data.address.road || "";
+        const houseNum = data.address.house_number || "";
+        
+        if (bairro) document.getElementById('gc-bairro').value = bairro;
+        if (road) document.getElementById('gc-address').value = `${road}${houseNum ? ', ' + houseNum : ''}`;
+        
+        showToast("Dados preenchidos!", "success");
+      }
+    } catch (e) { console.error("Erro no AutoFill:", e); }
+  }
+}
+
 async function uploadPhoto(file) {
   if (!file || !supabase) return null;
   const fileExt = file.name.split('.').pop();
@@ -384,6 +409,14 @@ document.addEventListener('DOMContentLoaded', () => {
       reader.readAsDataURL(file);
     }
   };
+
+  // --- AUTOPREENCHIMENTO: GATILHOS (v3.1.0) ---
+  const latField = document.getElementById('gc-lat');
+  const lngField = document.getElementById('gc-lng');
+  if (latField && lngField) {
+    latField.onblur = handleAutoFill;
+    lngField.onblur = handleAutoFill;
+  }
 
   supabase?.auth.onAuthStateChange((event, session) => {
     console.log("Auth Event:", event);
