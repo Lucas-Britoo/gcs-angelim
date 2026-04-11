@@ -234,6 +234,22 @@ async function uploadPhoto(file) {
   return publicUrl;
 }
 
+window.deleteGC = async (id) => {
+  if (!confirm("Tem certeza que deseja apagar este grupo permanentemente?")) return;
+  
+  try {
+    const { error } = await supabase?.from('gcs').delete().eq('id', id);
+    if (error) throw error;
+    
+    // Invalidação de Cache
+    localStorage.removeItem('angelim_gcs_cache');
+    showToast("Grupo removido!", "success");
+    fetchGCs();
+  } catch (err) {
+    showToast(`Erro ao apagar: ${err.message}`);
+  }
+};
+
 document.getElementById('gc-form').onsubmit = async (e) => {
   e.preventDefault();
   const id = document.getElementById('gc-edit-id').value;
