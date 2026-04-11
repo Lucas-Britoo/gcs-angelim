@@ -7,6 +7,21 @@ import L from 'leaflet';
 import { supabase, isSupabaseConfigured } from './lib/supabase.js';
 import { renderDashboard } from './admin-dashboard.js';
 
+if (!isSupabaseConfigured) {
+  console.warn("⚠️ Supabase: Chaves de API não encontradas. Configure as variáveis de ambiente.");
+}
+
+// --- ATIVAÇÃO DO MOTOR REALTIME (v3.0.0) ---
+if (supabase) {
+  supabase
+    .channel('public:gcs')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'gcs' }, (payload) => {
+      console.log('📡 Mudança detectada no banco:', payload.eventType);
+      fetchGCs(); // Atualiza tudo automaticamente
+    })
+    .subscribe();
+}
+
 // --- CONFIGURAÇÕES & ESTADO ---
 const APP_CONFIG = {
   VERSION: '1.9.0',
