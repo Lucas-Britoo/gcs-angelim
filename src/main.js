@@ -276,11 +276,25 @@ async function fetchGCs() {
 function renderPublicSheet(gcs) {
     const container = document.getElementById('public-gc-list');
     if(!container) return;
-    container.innerHTML = gcs.map(gc => `<div class="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm mb-3">
+    container.innerHTML = gcs.map(gc => `<div onclick="window.focusGC('${gc.id}')" class="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm mb-3 cursor-pointer active:scale-95 transition-transform hover:border-brand-accent">
         <h4 class="font-black text-xs uppercase text-brand-dark">${sanitize(gc.nome)}</h4>
         <p class="text-[10px] text-gray-400">${sanitize(gc.bairro)}</p>
     </div>`).join('');
 }
+
+// Navegação Inteligente do Mapa
+window.focusGC = (id) => {
+  const gc = globalGCs.find(g => String(g.id) === String(id));
+  if (gc && gc._marker && map) {
+    map.flyTo(gc._marker.getLatLng(), 16, { animate: true, duration: 1 });
+    gc._marker.openPopup();
+    
+    // Feedback tátil: se estiver no mobile, podemos fechar a aba de grupos ou rolar
+    if (window.innerWidth < 768) {
+       // Se houver uma aba expansível, poderíamos minimizá-la aqui
+    }
+  }
+};
 
 /**
  * GESTÃO DE AUTENTICAÇÃO SUPABASE
@@ -352,6 +366,18 @@ async function updateUI(session) {
     adminPanel.classList.add('hidden');
   }
 }
+
+// EVENTO: Abrir Login
+document.getElementById('login-trigger').addEventListener('click', () => {
+  if (!supabase?.auth.session) {
+     authOverlay.classList.remove('hidden');
+  }
+});
+
+// EVENTO: Fechar Login clicando fora
+authOverlay.addEventListener('click', (e) => {
+  if (e.target === authOverlay) authOverlay.classList.add('hidden');
+});
 
 // Listener de Estado de Autenticação
 supabase?.auth.onAuthStateChange((event, session) => {
