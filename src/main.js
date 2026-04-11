@@ -330,13 +330,24 @@ authForm.addEventListener('submit', async (e) => {
 
   try {
     if (isLoginMode) {
-      const { error } = await supabase?.auth.signInWithPassword({ email, password }) || { error: 'Configuração ausente' };
-      if (error) throw error;
+      const { error } = await supabase?.auth.signInWithPassword({ email, password }) || { error: new Error('Configuração ausente') };
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("E-mail ou senha incorretos. Verifique se a conta foi criada e confirmada no Supabase.");
+        }
+        throw error;
+      }
       showToast("Login realizado com sucesso!", "success");
+      authOverlay.classList.add('hidden');
     } else {
-      const { error } = await supabase?.auth.signUp({ email, password }) || { error: 'Configuração ausente' };
+      const { data, error } = await supabase?.auth.signUp({ email, password }) || { error: new Error('Configuração ausente') };
       if (error) throw error;
-      showToast("Conta criada! Verifique seu e-mail.", "success");
+      
+      if (data?.user && data?.session === null) {
+        showToast("Cadastro realizado! Verifique seu e-mail para confirmar a conta.", "success");
+      } else {
+        showToast("Conta criada e logada!", "success");
+      }
     }
   } catch (err) {
     showToast(err.message);
