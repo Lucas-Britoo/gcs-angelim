@@ -18,10 +18,17 @@ CREATE TABLE IF NOT EXISTS public.gcs (
     lng text
 );
 
--- Limpa a tabela caso ela tenha sujeira
+-- 2. Ativa o modo de segurança (RLS)
+ALTER TABLE public.gcs ENABLE ROW LEVEL SECURITY;
+
+-- 3. Políticas de Acesso
+CREATE POLICY "Leitura pública" ON public.gcs FOR SELECT USING (true);
+CREATE POLICY "Admin total" ON public.gcs FOR ALL TO authenticated USING (true);
+
+-- 4. Limpa a tabela caso ela tenha sujeira
 TRUNCATE TABLE public.gcs;
 
--- Injeta os dados originais
+-- 5. Injeta os dados originais
 INSERT INTO public.gcs (id, nome, dia, horario, bairro, endereco, lider, contato, obs, lat, lng) VALUES
 (1, 'GC Sao Francisco', 'Sexta', '19:30', 'São Francisco', 'Rua Joaquim Santos, 621', 'Álefe e Camila', '(86) 99918-6632', NULL, '-2.9105', '-41.7650'),
 (2, 'GC Centro', 'Quinta Feira', '19:30', 'Centro', 'Rua Pedro II, 1444', 'Paula Vaz', '(86) 99954-7775', NULL, '-2.9042', '-41.7761'),
