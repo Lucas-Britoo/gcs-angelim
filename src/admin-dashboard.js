@@ -55,9 +55,10 @@ export function renderDashboard(gcs, container) {
         }).join('')}
       </div>
 
+      ${topDistricts.length > 0 ? `
       <div class="pt-4 border-t border-gray-50">
          <p class="text-[10px] text-gray-400 leading-relaxed italic">Dica: O bairro <b>${sanitize(topDistricts[0][0])}</b> lidera com <b>${percentFixed(topDistricts[0][1], totalGCs)}%</b> da rede total.</p>
-      </div>
+      </div>` : ''}
     </div>
 
     <!-- Ações CRUD (Look Contemporâneo) -->
