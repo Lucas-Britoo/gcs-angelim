@@ -77,35 +77,28 @@
     </div>
 
     <!-- Mapa Fullscreen Background -->
+    <!-- Mapa Fullscreen Background -->
     <div id="map" class="w-full h-screen"></div>
 
-    <!-- Barra Superior / Busca -->
-    <header id="main-header" class="fixed left-4 right-4 md:right-auto md:w-96 z-[1000] flex flex-col gap-2 pointer-events-none transition-all duration-300">
-      <div class="bg-white/95 backdrop-blur-md shadow-lg rounded-2xl p-3 grid grid-cols-[1fr_auto] items-center gap-3 border border-gray-200 pointer-events-auto transition-transform duration-300 hover:shadow-xl">
-        <div class="flex items-center gap-3 min-w-0 overflow-hidden">
+    <!-- Barra Superior (v3.2.3) -->
+    <header id="main-header" class="fixed left-4 top-4 z-[1100] pointer-events-none transition-all duration-300">
+      <div class="bg-white/95 backdrop-blur-md shadow-lg rounded-2xl p-3 flex items-center gap-3 border border-gray-200 pointer-events-auto transition-transform duration-300 hover:shadow-xl">
+        <div class="flex items-center gap-3 pr-2 border-r border-gray-100">
           <div class="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center overflow-hidden shrink-0 border-2 border-brand-light">
             <img src="/logo.svg" alt="Logo Angelim" class="w-full h-full object-cover object-center" />
           </div>
-          <div class="min-w-0 flex-shrink-1">
-            <h1 class="text-sm font-bold text-gray-900 tracking-tight leading-tight truncate">ANGELIM</h1>
-            <h2 class="text-[10px] font-semibold text-gray-500 tracking-widest uppercase truncate">Parnaíba</h2>
+          <div class="min-w-0">
+            <h1 class="text-sm font-bold text-gray-900 tracking-tight leading-tight uppercase">ANGELIM</h1>
+            <h2 class="text-[9px] font-semibold text-gray-400 tracking-widest uppercase">Parnaíba</h2>
           </div>
         </div>
 
-        <div class="flex items-center gap-1 bg-gray-50/50 rounded-full p-0.5 border border-gray-100">
-          <button id="login-trigger" aria-label="Login" class="p-2.5 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all cursor-pointer">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-          </button>
-        </div>
+        <button id="login-trigger" aria-label="Login" class="p-2.5 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </button>
       </div>
 
-      <div class="mt-1 relative pointer-events-auto">
-        <input type="text" id="search-input" autocomplete="off" placeholder="Pesquisar Bairro ou GC..." class="w-full bg-white/95 backdrop-blur shadow-md border border-gray-200 rounded-xl pl-4 pr-10 py-3 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all">
-        <svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <ul id="search-results" class="hidden absolute top-full mt-2 w-full bg-white shadow-2xl rounded-xl border border-gray-100 max-h-64 overflow-y-auto z-50 custom-scroll text-sm"></ul>
-      </div>
-
-      <div id="app-status" class="hidden bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-md pointer-events-auto text-xs font-semibold" role="alert">
+      <div id="app-status" class="hidden mt-2 bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-md pointer-events-auto text-xs font-semibold" role="alert">
         <span id="app-status-message"></span>
       </div>
     </header>
@@ -175,13 +168,20 @@
       </div>
     </aside>
 
-    <!-- Gaveta Pública (v3.2.1) -->
-    <aside id="public-sheet" class="absolute bottom-0 left-0 right-0 md:bottom-4 md:left-4 md:right-auto md:w-[360px] z-[900] bg-white/95 backdrop-blur-xl shadow-2xl rounded-t-3xl md:rounded-3xl border border-gray-200 flex flex-col transition-transform duration-500 transform translate-y-[calc(100%-55px)] md:translate-y-0 h-[70vh] md:h-auto md:max-h-[85vh] pointer-events-auto touch-pan-y">
+    <!-- Gaveta Pública (v3.2.2 - Layout Corrigido) -->
+    <aside id="public-sheet" class="absolute bottom-0 left-0 right-0 md:top-28 md:bottom-6 md:left-6 md:right-auto md:w-[380px] z-[900] bg-white/95 backdrop-blur-xl shadow-2xl rounded-t-3xl md:rounded-3xl border border-gray-200 flex flex-col transition-all duration-500 transform translate-y-[calc(100%-55px)] md:translate-y-0 h-[70vh] md:h-auto pointer-events-auto touch-pan-y">
       <div id="sheet-handle" class="md:hidden w-full flex justify-center py-6 cursor-pointer hover:bg-gray-50 rounded-t-3xl border-b border-gray-100 flex-shrink-0 active:bg-gray-100 transition-colors" ontouchstart="void(0)">
         <div class="w-12 h-1.5 bg-gray-300/60 rounded-full"></div>
       </div>
-      <div class="px-6 pt-6 pb-2">
-        <h3 class="uppercase tracking-widest text-[10px] font-bold text-gray-400">Explorar Grupos</h3>
+      
+      <div class="px-6 pt-6 pb-4 border-b border-gray-50">
+        <h3 class="uppercase tracking-widest text-[10px] font-bold text-gray-400 mb-4">Explorar Grupos</h3>
+        <!-- Busca integrada na estrutura -->
+        <div class="relative group">
+          <input type="text" id="public-search" placeholder="Pesquisar Bairro ou GC..." 
+            class="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-5 py-3.5 text-sm focus:ring-2 focus:ring-brand-dark outline-none transition-all shadow-sm group-hover:border-gray-200">
+          <svg class="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
       </div>
       
       <div id="public-gc-list" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 pb-8">

@@ -430,6 +430,20 @@ document.addEventListener('DOMContentLoaded', () => {
     lngField.onblur = handleAutoFill;
   }
 
+  // --- BUSCA PÚBLICA INTEGRADA (v3.2.3) ---
+  const publicSearch = document.getElementById('public-search');
+  if (publicSearch) {
+    publicSearch.oninput = (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = State.globalGCs.filter(gc => 
+        gc.nome.toLowerCase().includes(term) || 
+        gc.bairro.toLowerCase().includes(term)
+      );
+      renderPublicSheet(filtered);
+      renderGCMarkers(filtered);
+    };
+  }
+
   supabase?.auth.onAuthStateChange((event, session) => {
     console.log("Auth Event:", event);
     updateUI(session);
