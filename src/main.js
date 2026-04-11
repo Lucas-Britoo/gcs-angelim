@@ -175,7 +175,11 @@ function renderGCMarkers(gcs) {
       iconSize: [44, 44], iconAnchor: [22, 22], popupAnchor: [0, -22]
     });
 
-    const marker = L.marker(coords, { icon: brandIcon }).bindPopup(popupContent);
+    const marker = L.marker(coords, { icon: brandIcon }).bindPopup(popupContent, {
+      maxWidth: 280,
+      minWidth: 220,
+      className: 'custom-popup'
+    });
     gc._marker = marker;
     marker.addTo(markersLayer);
   });
@@ -188,7 +192,7 @@ function getPopupStyle(gc, distanceHtml) {
   const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${gc.lat},${gc.lng}`;
 
   return `
-    <div class="custom-popup min-w-[240px] overflow-hidden rounded-[2rem] shadow-2xl border border-gray-100 bg-white relative">
+    <div class="custom-popup w-full overflow-hidden rounded-[1.5rem] shadow-2xl bg-white relative">
       <!-- Botão Compartilhar -->
       <button onclick="window.shareGC('${name}', '${sanitize(gc.bairro)}')" class="absolute top-4 right-4 z-[10] bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/40 active:scale-90 transition-all border border-white/30">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
@@ -205,10 +209,10 @@ function getPopupStyle(gc, distanceHtml) {
           ${distanceHtml}
         </div>`}
       
-      <div class="p-5">
-        <h3 class="font-black text-gray-900 text-base uppercase tracking-tight mb-3">${name}</h3>
+      <div class="p-4">
+        <h3 class="font-black text-gray-900 text-sm uppercase tracking-tight mb-2">${name}</h3>
         
-        <div class="space-y-3 mb-5">
+        <div class="space-y-2 mb-4">
           <div class="flex items-start gap-2">
              <div class="w-5 h-5 rounded bg-gray-50 flex items-center justify-center shrink-0 mt-0.5"><svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
              <p class="text-[11px] text-gray-600 font-semibold">${sanitize(gc.dia)}, às ${sanitize(gc.horario)}</p>
