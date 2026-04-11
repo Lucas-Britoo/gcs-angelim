@@ -61,18 +61,54 @@ export function renderDashboard(gcs, container) {
       </div>
     </div>
 
-    <!-- Botões de Ação CRUD (Próxima Fase) -->
+    <!-- Botões de Ação CRUD -->
     <div class="grid grid-cols-2 gap-3 mt-6">
-       <button class="bg-white border-2 border-dashed border-gray-300 text-gray-400 p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-brand-dark hover:text-brand-dark transition-all opacity-50 cursor-not-allowed">
-         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-         <span class="text-[10px] font-bold uppercase">Novo GC</span>
+       <button id="dashboard-new-gc" class="bg-white border-2 border-dashed border-gray-300 text-gray-400 p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-brand-dark hover:text-brand-dark transition-all group">
+         <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+         <span class="text-[10px] font-bold uppercase tracking-wider">Novo GC</span>
        </button>
-       <button class="bg-white border-2 border-dashed border-gray-300 text-gray-400 p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-brand-dark hover:text-brand-dark transition-all opacity-50 cursor-not-allowed">
-         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-         <span class="text-[10px] font-bold uppercase">Editar GCs</span>
+       <button id="dashboard-list-gcs" class="bg-white border-2 border-dashed border-gray-300 text-gray-400 p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-brand-dark hover:text-brand-dark transition-all group">
+         <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+         <span class="text-[10px] font-bold uppercase tracking-wider">Gerenciar</span>
        </button>
     </div>
   `;
+
+  container.innerHTML = statsHtml;
+
+  // Listeners para os botões do Dashboard
+  document.getElementById('dashboard-new-gc').onclick = () => window.openGCEditor();
+  document.getElementById('dashboard-list-gcs').onclick = () => renderAdminTable(gcs, container);
+}
+
+/**
+ * Renderiza a lista de GCs para escolha de edição (CRUD List)
+ */
+function renderAdminTable(gcs, container) {
+  const listHtml = `
+    <div class="space-y-3">
+      <div class="flex items-center gap-2 mb-4">
+        <button id="back-to-stats" class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+        <span class="font-bold text-sm uppercase tracking-wider">Lista de Grupos</span>
+      </div>
+      
+      ${gcs.map(gc => `
+        <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm">
+          <div class="min-w-0">
+            <p class="font-bold text-xs text-gray-900 dark:text-gray-100 truncate">${sanitize(gc.nome)}</p>
+            <p class="text-[10px] text-gray-500">${sanitize(gc.bairro)}</p>
+          </div>
+          <button onclick="window.openGCEditor(${JSON.stringify(gc).replace(/"/g, '&quot;')})" class="p-2 text-brand-dark hover:bg-gray-50 rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          </button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  container.innerHTML = listHtml;
+  document.getElementById('back-to-stats').onclick = () => renderDashboard(gcs, container);
+}
 
   container.innerHTML = statsHtml;
 }
