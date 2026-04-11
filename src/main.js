@@ -170,10 +170,18 @@ window.focusGC = (id) => {
 };
 
 // --- CRUD: EDITOR LOGIC ---
-window.openGCEditor = (gc = null) => {
+window.openGCEditor = (idOrGc = null) => {
   const editor = document.getElementById('gc-editor');
   const dashContent = document.getElementById('admin-content');
   const title = document.getElementById('admin-title');
+
+  // Nova Lógica: Se vier apenas o ID, busca no State Global
+  let gc = null;
+  if (idOrGc && (typeof idOrGc === 'string' || typeof idOrGc === 'number')) {
+    gc = State.globalGCs.find(g => String(g.id) === String(idOrGc));
+  } else {
+    gc = idOrGc;
+  }
 
   dashContent.classList.add('hidden');
   editor.classList.remove('hidden');
