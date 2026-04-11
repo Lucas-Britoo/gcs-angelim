@@ -269,9 +269,18 @@ document.getElementById('gc-form').onsubmit = async (e) => {
       : await supabase?.from('gcs').insert([gcData]) || { error: 'Supabase Offline' };
     
     if (error) throw error;
+    
+    // Invalidação de Cache (v2.5.0)
+    localStorage.removeItem('angelim_gcs_cache');
+    
     showToast("Sincronizado com Sucesso!", "success");
     document.getElementById('close-editor').click();
-    fetchGCs();
+    
+    // Pequeno delay para garantir propagação no Supabase
+    setTimeout(() => {
+      fetchGCs();
+    }, 500);
+
   } catch (err) { 
     showToast(`Erro: ${err.message || 'Falha no processamento'}`); 
     console.error(err);
