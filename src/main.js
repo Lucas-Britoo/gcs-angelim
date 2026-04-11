@@ -187,12 +187,18 @@ window.openGCEditor = (idOrGc = null) => {
   editor.classList.remove('hidden');
   title.textContent = gc ? "Editando Grupo" : "Novo Grupo";
 
-  // Reset/Preencher formulário
+  // Reset/Preencher formulário (v2.0.0 Total)
   document.getElementById('gc-form').reset();
   document.getElementById('gc-edit-id').value = gc ? gc.id : "";
   document.getElementById('gc-name').value = gc ? gc.nome || "" : "";
   document.getElementById('gc-bairro').value = gc ? gc.bairro || "" : "";
   document.getElementById('gc-leader').value = gc ? gc.lider || "" : "";
+  document.getElementById('gc-dia').value = gc ? gc.dia || "" : "";
+  document.getElementById('gc-horario').value = gc ? gc.horario || "" : "";
+  document.getElementById('gc-contato').value = gc ? gc.contato || "" : "";
+  document.getElementById('gc-address').value = gc ? gc.endereco || "" : "";
+  document.getElementById('gc-lat').value = gc ? gc.lat || "" : "";
+  document.getElementById('gc-lng').value = gc ? gc.lng || "" : "";
   
   if (gc?.foto_url) {
     document.getElementById('photo-preview').src = gc.foto_url;
@@ -217,6 +223,12 @@ document.getElementById('gc-form').onsubmit = async (e) => {
     nome: document.getElementById('gc-name').value,
     bairro: document.getElementById('gc-bairro').value,
     lider: document.getElementById('gc-leader').value,
+    dia: document.getElementById('gc-dia').value,
+    horario: document.getElementById('gc-horario').value,
+    contato: document.getElementById('gc-contato').value,
+    endereco: document.getElementById('gc-address').value,
+    lat: document.getElementById('gc-lat').value,
+    lng: document.getElementById('gc-lng').value,
     atualizado_em: new Date()
   };
 
