@@ -1,10 +1,11 @@
 import L from 'leaflet';
+import { renderDashboard } from './admin-dashboard.js';
 
 /**
  * Utilitário de Segurança: Sanitização rigorosa via DOM TextNode
  * Evita XSS forçando qualquer string para texto plano antes de inserir no DOM.
  */
-function sanitize(str) {
+export function sanitize(str) {
   if (!str) return '';
   const temp = document.createElement('div');
   temp.textContent = str;
@@ -146,6 +147,8 @@ function renderGCMarkers(gcs) {
 
     const navUrl = sanitize(`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`);
     const wppLink = `https://wa.me/55${contato.replace(/\D/g, "")}`;
+    const wppMsg = encodeURIComponent(`Olá! Vi o ${name} no Mapa Angelim e tenho interesse em participar de um encontro. Como faço?`);
+    const joinWppLink = `${wppLink}?text=${wppMsg}`;
 
     // Construção segura premium google maps style com campos novos
     const popupContent = `
@@ -174,21 +177,18 @@ function renderGCMarkers(gcs) {
             </p>
             
             ${contato && contato !== '-' ? `
-            <p class="text-gray-800 leading-tight mt-1">
-              <span class="font-bold text-gray-400 block text-[10px] uppercase tracking-widest mb-0.5">Contato</span> 
-              <a href="${wppLink}" target="_blank" class="text-green-600 hover:text-green-700 font-bold flex items-center hover:underline cursor-pointer">
-                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 001.333 4.993L2 22l5.233-1.237a9.994 9.994 0 004.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0012.012 2zm5.796 14.34c-.241.677-1.192 1.3-1.637 1.339-.427.039-1.272.183-3.64-1.393-2.844-1.894-4.664-5.006-4.805-5.197-.139-.193-1.147-1.545-1.147-2.946 0-1.402.723-2.096.979-2.366.255-.269.554-.338.735-.338.181 0 .363.003.521.01.168.007.391-.065.611.468.225.545.728 1.782.793 1.916.064.135.105.293.023.456-.081.161-.122.256-.242.39-.12.135-.251.29-.36.402-.121.121-.249.255-.109.497.139.24 .618.99 1.296 1.597.876.784 1.6026 1.028 1.843 1.15.241.12.383.099.525-.065.143-.162.617-.714.782-.96.164-.244.327-.202.551-.12.224.081 1.416.666 1.658.788.242.12.404.181.463.282.059.101.059.585-.182 1.261z"/></svg>
-                ${contato}
+            <div class="flex flex-col gap-2 mt-3">
+              <a href="${joinWppLink}" target="_blank" class="w-full flex items-center justify-center bg-green-500 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-green-600 transition-all shadow-md active:scale-95 uppercase tracking-wide">
+                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 001.333 4.993L2 22l5.233-1.237a9.994 9.994 0 004.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0012.012 2zm5.796 14.34c-.241.677-1.192 1.3-1.637 1.339-.427.039-1.272.183-3.64-1.393-2.844-1.894-4.664-5.006-4.805-5.197-.139-.193-1.147-1.545-1.147-2.946 0-1.402.723-2.096.979-2.366.255-.269.554-.338.735-.338.181 0 .363.003.521.01.168.007.391-.065.611.468.225.545.728 1.782.793 1.916.064.135.105.293.023.456-.081.161-.122.256-.242.39-.12.135-.251.29-.36.402-.121.121-.249.255-.109.497.139.24 .618.99 1.296 1.597.876.784 1.6026 1.028 1.843 1.15.241.12.383.099.525-.065.143-.162.617-.714.782-.96.164-.244.327-.202.551-.12.224.081 1.416.666 1.658.788.242.12.404.181.463.282.059.101.059.585-.182 1.261z"/></svg>
+                Quero Participar
               </a>
-            </p>` : ''}
-
-            ${obs ? `<div class="bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold px-2 py-1 rounded w-full mt-1.5"><strong class="uppercase text-amber-600 block text-[9px] min-w-full">Observação</strong>${obs}</div>` : ''}
+              <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center border border-gray-200 text-gray-600 py-2 rounded-lg text-xs font-bold hover:bg-gray-50 transition-all active:scale-95">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-3 5.447 2.724A1 1 0 0121 7.618v10.764a1 1 0 01-1.447.894L15 17l-6 3z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7v13M15 4v13"></path></svg>
+                VER NO MAPA
+              </a>
+            </div>` : ''}
 
           </div>
-          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-brand-dark text-white py-2.5 rounded-lg text-sm font-bold hover:bg-brand-accent transition-all shadow-md active:scale-95">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l6-3 5.447 2.724A1 1 0 0121 7.618v10.764a1 1 0 01-1.447.894L15 17l-6 3z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7v13M15 4v13"></path></svg>
-            ROTAS
-          </a>
         </div>
       </div>
     `;
@@ -208,6 +208,26 @@ function renderGCMarkers(gcs) {
   });
 }
 
+/**
+ * Utilitário de Status Online/Offline
+ */
+function updateOnlineStatus() {
+  const statusEl = document.getElementById('online-status');
+  if(!statusEl) return;
+
+  if (navigator.onLine) {
+    statusEl.classList.remove('bg-gray-400', 'shadow-none');
+    statusEl.classList.add('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
+    statusEl.title = "Sistema Online";
+  } else {
+    statusEl.classList.remove('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
+    statusEl.classList.add('bg-gray-400', 'shadow-none');
+    statusEl.title = "Sistema Offline (Modo Cache)";
+  }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
 /**
  * Motor de Busca da Barra Superior
  */
@@ -418,10 +438,11 @@ function handleAuthChange(user) {
       let html = `<p class="text-sm text-gray-700">Bem-vindo, <strong>${emailSafe}</strong>.</p>`;
       
       if (isAdmin) {
-        html += `<div class="mt-4 p-4 bg-gray-100 rounded-md border border-gray-200">
-          <p class="text-xs text-gray-500 mb-2">Permissões de Admin ativas. Ferramentas avançadas liberadas.</p>
-          <button class="w-full bg-red-600 text-white text-sm py-2 rounded shadow hover:bg-red-700">Forçar Sincronização Dados</button>
-        </div>`;
+        // Renderizar Dashboard em vez de lista simples
+        renderDashboard(globalGCs, adminContent);
+        
+        // Re-fetch points forçando atualização ao logar
+        fetchGCs(true);
       } else if (isEditor) {
         html += `<div class="mt-4 p-4 bg-gray-100 rounded-md border border-gray-200">
           <p class="text-xs text-gray-500">Permissão de Editor ativa. Apenas modificações textuais permitidas.</p>
@@ -448,10 +469,44 @@ function handleAuthChange(user) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log("App v1.2.1 - DOM Loaded (Security Patch)");
   
+  // Inicializa monitor de rede
+  updateOnlineStatus();
+
   // Inicializa mapa
   initMap();
 
-  // Registro do Service Worker para PWA (Movido para cá devido ao CSP)
+  // Lógica de Dark Mode
+  const modeToggle = document.getElementById('dark-mode-toggle');
+  const moon = document.getElementById('moon-icon');
+  const sun = document.getElementById('sun-icon');
+  
+  modeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    moon.classList.toggle('hidden', isDark);
+    sun.classList.toggle('hidden', !isDark);
+    
+    // Troca o tile do mapa se ele existir
+    if (map) {
+      map.eachLayer(layer => {
+        if(layer._url && layer._url.includes('basemaps')) {
+          map.removeLayer(layer);
+        } else if (layer._url && layer._url.includes('openstreetmap')) {
+            map.removeLayer(layer);
+        }
+      });
+      const newUrl = isDark 
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      
+      L.tileLayer(newUrl, {
+        maxZoom: 19,
+        attribution: isDark ? '&copy; CartoDB' : '&copy; OpenStreetMap'
+      }).addTo(map);
+    }
+  });
+
+  // Registro do Service Worker for PWA
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/service-worker.js').then((reg) => {
@@ -483,9 +538,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.netlifyIdentity.init();
     
     // Listener de clique para o botão de Login (Cadeado)
-    const lockBtn = document.getElementById('auth-lock-btn');
-    if (lockBtn) {
-      lockBtn.addEventListener('click', () => {
+    const loginTrigger = document.getElementById('login-trigger');
+    if (loginTrigger) {
+      loginTrigger.addEventListener('click', () => {
         console.log("Abrindo Modal de Login...");
         window.netlifyIdentity.open('login');
       });

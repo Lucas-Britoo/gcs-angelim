@@ -4,10 +4,60 @@
   font-size: clamp(14px, 1vw + 10px, 18px);
 }
 
+/* --- TEMA DARK --- */
+body.dark {
+  background-color: #121212;
+  color: #f3f4f6;
+}
+
+body.dark .bg-white\/95, 
+body.dark .bg-white {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+  color: #f3f4f6;
+  border-color: #374151;
+}
+
+body.dark .text-gray-900,
+body.dark .text-gray-800 {
+  color: #f3f4f6 !important;
+}
+
+body.dark .text-gray-500,
+body.dark .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+body.dark #search-input {
+  background-color: #374151;
+  color: white;
+  border-color: #4b5563;
+}
+
+body.dark .custom-popup .leaflet-popup-content-wrapper {
+  background: #1f2937;
+  color: white;
+  border: 1px solid #374151;
+}
+
+body.dark .custom-popup .leaflet-popup-tip {
+  background: #1f2937;
+}
+
+body.dark #auth-lock-btn {
+  background-color: rgba(31, 41, 55, 0.5);
+  border-color: #374151;
+}
+
+body.dark #public-gc-list .gc-card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
 body {
   margin: 0;
   padding: 0;
   background-color: #f9fafb;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* --- SUPORTE A SAFE AREAS (iOS Notch / Home Bar) --- */
