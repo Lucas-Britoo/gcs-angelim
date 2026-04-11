@@ -216,31 +216,67 @@ document.getElementById('close-editor').onclick = () => {
   document.getElementById('admin-title').textContent = "Painel";
 };
 
+async function uploadPhoto(file) {
+  if (!file || !supabase) return null;
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+  
+  const { error } = await supabase.storage
+    .from('gc-photos')
+    .upload(fileName, file);
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('gc-photos')
+    .getPublicUrl(fileName);
+
+  return publicUrl;
+}
+
 document.getElementById('gc-form').onsubmit = async (e) => {
   e.preventDefault();
   const id = document.getElementById('gc-edit-id').value;
-  const gcData = {
-    nome: document.getElementById('gc-name').value,
-    bairro: document.getElementById('gc-bairro').value,
-    lider: document.getElementById('gc-leader').value,
-    dia: document.getElementById('gc-dia').value,
-    horario: document.getElementById('gc-horario').value,
-    contato: document.getElementById('gc-contato').value,
-    endereco: document.getElementById('gc-address').value,
-    lat: document.getElementById('gc-lat').value,
-    lng: document.getElementById('gc-lng').value
-  };
-
+  const photoFile = document.getElementById('gc-photo-input').files[0];
+  const loader = document.getElementById('upload-status');
+  
   try {
+    let foto_url = null;
+    
+    // Se houver nova foto, fazemos o upload primeiro
+    if (photoFile) {
+      loader.classList.remove('hidden');
+      foto_url = await uploadPhoto(photoFile);
+      loader.classList.add('hidden');
+    }
+
+    const gcData = {
+      nome: document.getElementById('gc-name').value,
+      bairro: document.getElementById('gc-bairro').value,
+      lider: document.getElementById('gc-leader').value,
+      dia: document.getElementById('gc-dia').value,
+      horario: document.getElementById('gc-horario').value,
+      contato: document.getElementById('gc-contato').value,
+      endereco: document.getElementById('gc-address').value,
+      lat: document.getElementById('gc-lat').value,
+      lng: document.getElementById('gc-lng').value
+    };
+
+    if (foto_url) gcData.foto_url = foto_url;
+
     const { error } = id 
       ? await supabase?.from('gcs').update(gcData).eq('id', id)
       : await supabase?.from('gcs').insert([gcData]) || { error: 'Supabase Offline' };
     
     if (error) throw error;
-    showToast("Sucesso! Sincronizando...", "success");
+    showToast("Sincronizado com Sucesso!", "success");
     document.getElementById('close-editor').click();
     fetchGCs();
-  } catch (err) { showToast(err.message); }
+  } catch (err) { 
+    showToast("Erro no processamento."); 
+    console.error(err);
+    loader.classList.add('hidden');
+  }
 };
 
 // --- AUTH: PORTAL ACCESS ---
@@ -288,6 +324,27 @@ document.addEventListener('DOMContentLoaded', () => {
   authOverlay.onclick = (e) => { if (e.target === authOverlay) authOverlay.classList.add('hidden'); };
   
   // Listener Único de Autenticação para evitar duplicidade
+  // --- MÉDIA: CLIQUE GALERIA E PREVIEW ---
+  const dropzone = document.getElementById('photo-dropzone');
+  const fileInput = document.getElementById('gc-photo-input');
+  const preview = document.getElementById('photo-preview');
+  const placeholder = document.getElementById('photo-placeholder');
+
+  dropzone.onclick = () => fileInput.click();
+
+  fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        preview.src = event.target.result;
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   supabase?.auth.onAuthStateChange((event, session) => {
     console.log("Auth Event:", event);
     updateUI(session);
