@@ -254,12 +254,12 @@ document.getElementById('gc-form').onsubmit = async (e) => {
       nome: document.getElementById('gc-name').value,
       bairro: document.getElementById('gc-bairro').value,
       lider: document.getElementById('gc-leader').value,
-      dia: document.getElementById('gc-dia').value,
-      horario: document.getElementById('gc-horario').value,
-      contato: document.getElementById('gc-contato').value,
-      endereco: document.getElementById('gc-address').value,
-      lat: document.getElementById('gc-lat').value,
-      lng: document.getElementById('gc-lng').value
+      dia: document.getElementById('gc-dia').value || null,
+      horario: document.getElementById('gc-horario').value || null,
+      contato: document.getElementById('gc-contato').value || null,
+      endereco: document.getElementById('gc-address').value || null,
+      lat: document.getElementById('gc-lat').value || null,
+      lng: document.getElementById('gc-lng').value || null
     };
 
     if (foto_url) gcData.foto_url = foto_url;
@@ -273,7 +273,7 @@ document.getElementById('gc-form').onsubmit = async (e) => {
     document.getElementById('close-editor').click();
     fetchGCs();
   } catch (err) { 
-    showToast("Erro no processamento."); 
+    showToast(`Erro: ${err.message || 'Falha no processamento'}`); 
     console.error(err);
     loader.classList.add('hidden');
   }
