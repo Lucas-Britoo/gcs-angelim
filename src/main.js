@@ -466,8 +466,7 @@ gcForm.onsubmit = async (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   if (!isSupabaseConfigured) {
     document.getElementById('app-status').classList.remove('hidden');
-    document.getElementById('app-status-message').textContent = "Configuração Incompleta: Adicione VITE_SUPABASE_URL no Netlify.";
-    return;
+    document.getElementById('app-status-message').textContent = "Modo Visualização: Adicione as chaves no Netlify para ativar Login e Mapa em tempo real.";
   }
 
   initMap();
