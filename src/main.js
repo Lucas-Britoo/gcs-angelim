@@ -248,7 +248,13 @@ async function updateUI(session) {
   if (session) {
     adminPanel.classList.remove('hidden');
     loginTrigger.innerHTML = `<div class="w-8 h-8 rounded-full bg-brand-dark text-white flex items-center justify-center font-black text-[10px]">${session.user.email.substring(0,2).toUpperCase()}</div>`;
-    renderDashboard(State.globalGCs, document.getElementById('admin-content'));
+    
+    // Se ainda não temos dados, buscamos agora para garantir o dash preenchido
+    if (State.globalGCs.length === 0) {
+      await fetchGCs();
+    } else {
+      renderDashboard(State.globalGCs, document.getElementById('admin-content'));
+    }
   } else {
     adminPanel.classList.add('hidden');
     loginTrigger.innerHTML = `<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>`;
@@ -261,8 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
   authForm.onsubmit = handleLogin;
   document.getElementById('login-trigger').onclick = () => authOverlay.classList.remove('hidden');
   authOverlay.onclick = (e) => { if (e.target === authOverlay) authOverlay.classList.add('hidden'); };
-  supabase?.auth.onAuthStateChange((_, session) => updateUI(session));
-  supabase?.auth.getSession().then(({ data: { session } }) => updateUI(session));
+  
+  // Listener Único de Autenticação para evitar duplicidade
+  supabase?.auth.onAuthStateChange((event, session) => {
+    console.log("Auth Event:", event);
+    updateUI(session);
+  });
 });
 
 window.signOut = async () => { await supabase?.auth.signOut(); window.location.reload(); };
