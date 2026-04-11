@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { supabase } from './lib/supabase.js';
+import { supabase, isSupabaseConfigured } from './lib/supabase.js';
 import { renderDashboard } from './admin-dashboard.js';
 
 /**
@@ -247,9 +247,13 @@ async function fetchGCs() {
   // 1. Tentar carregar do Cache primeiro (Instant Load)
   const cachedData = localStorage.getItem(CACHE_KEY);
   if (cachedData && !hasFetchedInitialData) {
-    globalGCs = JSON.parse(cachedData);
-    renderGCMarkers(globalGCs);
-    renderPublicSheet(globalGCs);
+    try {
+      globalGCs = JSON.parse(cachedData);
+      if (Array.isArray(globalGCs)) {
+        renderGCMarkers(globalGCs);
+        renderPublicSheet(globalGCs);
+      }
+    } catch (e) { localStorage.removeItem(CACHE_KEY); }
   }
 
   try {
@@ -460,6 +464,12 @@ gcForm.onsubmit = async (e) => {
 
 // Start
 document.addEventListener('DOMContentLoaded', () => {
+  if (!isSupabaseConfigured) {
+    document.getElementById('app-status').classList.remove('hidden');
+    document.getElementById('app-status-message').textContent = "Configuração Incompleta: Adicione VITE_SUPABASE_URL no Netlify.";
+    return;
+  }
+
   initMap();
   
   // Verifica sessão inicial

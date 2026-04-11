@@ -32,7 +32,7 @@
 
   <!-- Modal de Autenticação Supabase -->
   <div id="auth-overlay" class="fixed inset-0 bg-brand-dark/40 backdrop-blur-md z-[2000] flex items-center justify-center px-4 transition-all duration-300 hidden">
-    <div class="bg-white/95 dark:bg-gray-800 backdrop-blur shadow-2xl rounded-[2.5rem] p-8 w-full max-w-md border border-white/20 relative overflow-hidden flex flex-col">
+    <div class="bg-white/95 backdrop-blur shadow-2xl rounded-[2.5rem] p-8 w-full max-w-md border border-white/20 relative overflow-hidden flex flex-col">
       <!-- Decorativo -->
       <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-accent/20 rounded-full blur-2xl"></div>
       
@@ -40,7 +40,7 @@
         <div class="w-16 h-16 bg-brand-dark rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg">
           <img src="/logo.svg" alt="Logo" class="w-10 h-10 object-contain">
         </div>
-        <h2 id="auth-title" class="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight">Bem-vindo</h2>
+        <h2 id="auth-title" class="text-2xl font-black text-gray-900 tracking-tight">Bem-vindo</h2>
         <p id="auth-subtitle" class="text-sm text-gray-500 mt-1">Acesse para gerenciar o Mapa</p>
       </div>
 
@@ -48,12 +48,12 @@
         <div>
           <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 ml-1">E-mail</label>
           <input type="email" id="auth-email" required placeholder="seu@email.com" 
-            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all dark:text-white">
+            class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all">
         </div>
         <div class="relative">
           <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 ml-1">Senha</label>
           <input type="password" id="auth-password" required placeholder="••••••••" 
-            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all dark:text-white">
+            class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all">
         </div>
 
         <button type="submit" id="auth-submit-btn" class="w-full bg-brand-dark text-white py-4 rounded-2xl font-bold text-sm shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 mt-4">
@@ -63,15 +63,13 @@
       </form>
 
       <div class="mt-6 text-center">
-        <button id="auth-switch-btn" class="text-xs font-semibold text-brand-dark/60 dark:text-gray-400 hover:text-brand-dark">Ainda não tem conta? <span class="text-brand-dark underline underline-offset-4">Cadastre-se</span></button>
+        <button id="auth-switch-btn" class="text-xs font-semibold text-brand-dark/60 hover:text-brand-dark">Ainda não tem conta? <span class="text-brand-dark underline underline-offset-4">Cadastre-se</span></button>
       </div>
     </div>
   </div>
 
   <!-- Mapa Fullscreen Background -->
-  <div id="map-container" class="absolute inset-0 z-0 w-full h-full">
-    <div id="map" class="w-full h-full"></div>
-  </div>
+    <div id="map" class="w-full h-screen"></div>
 
   <!-- Interface Flutuante: Tipo Google Maps -->
 
@@ -79,7 +77,7 @@
   <header id="main-header" class="fixed left-4 right-4 md:right-auto md:w-96 z-[1000] flex flex-col gap-2 pointer-events-none transition-all duration-300">
 
     <!-- Caixa Principal (Logo + Auth) -->
-    <div class="bg-white/95 backdrop-blur-md shadow-lg rounded-2xl p-3 grid grid-cols-[1fr_auto] items-center gap-3 border border-gray-200 pointer-events-auto transition-transform duration-300 hover:shadow-xl dark:bg-gray-800 dark:border-gray-700">
+    <div class="bg-white/95 backdrop-blur-md shadow-lg rounded-2xl p-3 grid grid-cols-[1fr_auto] items-center gap-3 border border-gray-200 pointer-events-auto transition-transform duration-300 hover:shadow-xl">
       
       <!-- Lado Esquerdo: Logo e Título -->
       <div class="flex items-center gap-3 min-w-0 overflow-hidden">
@@ -102,9 +100,9 @@
 
     <!-- Barra de Pesquisa Integrada -->
     <div class="mt-1 relative pointer-events-auto">
-      <input type="text" id="search-input" autocomplete="off" placeholder="Pesquisar Bairro ou GC..." class="w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur shadow-md border border-gray-200 dark:border-gray-700 rounded-xl pl-4 pr-10 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all">
+      <input type="text" id="search-input" autocomplete="off" placeholder="Pesquisar Bairro ou GC..." class="w-full bg-white/95 backdrop-blur shadow-md border border-gray-200 rounded-xl pl-4 pr-10 py-3 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-dark transition-all">
       <svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <ul id="search-results" class="hidden absolute top-full mt-2 w-full bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-100 dark:border-gray-700 max-h-64 overflow-y-auto z-50 custom-scroll text-sm"></ul>
+      <ul id="search-results" class="hidden absolute top-full mt-2 w-full bg-white shadow-2xl rounded-xl border border-gray-100 max-h-64 overflow-y-auto z-50 custom-scroll text-sm"></ul>
     </div>
 
     <!-- App Status / Erro - Oculto por padrão -->
@@ -132,15 +130,15 @@
       </div>
 
       <!-- Área de Conteúdo Dinâmico (Dashboard ou Formulário) -->
-      <div id="admin-content" class="space-y-4 text-sm text-gray-800 dark:text-gray-200">
+      <div id="admin-content" class="space-y-4 text-sm text-gray-800">
         <p class="animate-pulse">Sincronizando base de dados...</p>
       </div>
 
       <!-- Formulário de Editor de GC (Oculto por padrão) -->
       <div id="gc-editor" class="hidden space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div class="flex items-center gap-2 mb-4">
-          <button id="close-editor" class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-          <span class="font-bold text-sm uppercase tracking-wider text-brand-dark dark:text-brand-light">Editar Grupo</span>
+          <button id="close-editor" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+          <span class="font-bold text-sm uppercase tracking-wider text-brand-dark">Editar Grupo</span>
         </div>
 
         <form id="gc-form" class="space-y-4">
@@ -161,9 +159,9 @@
           </div>
 
           <div class="grid grid-cols-1 gap-4">
-            <input type="text" id="gc-name" placeholder="Nome do GC" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
-            <input type="text" id="gc-bairro" placeholder="Bairro" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
-            <input type="text" id="gc-leader" placeholder="Líder" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
+            <input type="text" id="gc-name" placeholder="Nome do GC" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
+            <input type="text" id="gc-bairro" placeholder="Bairro" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
+            <input type="text" id="gc-leader" placeholder="Líder" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
           </div>
 
           <button type="submit" id="save-gc-btn" class="w-full bg-brand-dark text-white py-4 rounded-2xl font-bold text-sm shadow-xl active:scale-95 transition-all">Salvar Alterações</button>
