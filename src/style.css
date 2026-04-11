@@ -2,131 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tipografia Adaptativa e Reset de Safe Area */
+/* --- VARIÁVEIS DO DESIGN SYSTEM (Especialista) --- */
 :root {
-  /* Escala dinâmica: garante legibilidade automática em telas pequenas e grandes */
-  font-size: clamp(14px, 1vw + 10px, 18px);
+  font-size: clamp(14px, 1vw + 10px, 18px); /* Tipografia Adaptativa */
+  --brand-dark: #171717;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-blur: blur(12px);
+  --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-/* Força tamanho do logo para evitar 'explosão' caso as classes falhem */
-img[alt="Logo Angelim"] {
-  max-width: 40px !important;
-  max-height: 40px !important;
-}
-
+/* Reset de Acessibilidade e Performance */
 body {
   margin: 0;
   padding: 0;
-  background-color: #f9fafb;
+  background-color: #f3f4f6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-
 
 /* --- SUPORTE A SAFE AREAS (iOS Notch / Home Bar) --- */
 #main-header {
-  /* Distância adaptável: no iPhone X+ usa o recuo do sistema, no resto usa 1rem */
   top: max(1rem, env(safe-area-inset-top)) !important;
-}
-
-#public-sheet {
-  /* Garante que o conteúdo da gaveta não fique atrás da 'Home Bar' do iOS */
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
-}
-
-#admin-panel {
-  /* Painel admin também respeita o Notch quando em modo mobile */
-  top: max(1rem, env(safe-area-inset-top));
-}
-
-#map-container {
-  z-index: 10;
-}
-
-/* Customização dos elementos Leaflet para Google Maps UI Feel */
-.leaflet-control-zoom {
-  border: none !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  border-radius: 0.75rem !important;
-  overflow: hidden;
-  /* Desvia o controle de zoom da safe area lateral se necessário */
-  margin-right: max(10px, env(safe-area-inset-right)) !important;
-}
-
-.leaflet-control-zoom-in, 
-.leaflet-control-zoom-out {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px);
-  color: #171717 !important;
-}
-
-/* Ajusta o popup para o tema escuro/glass */
-.custom-popup .leaflet-popup-content-wrapper {
-  background: white;
-  border-radius: 1.25rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-  padding: 0 !important;
-  border: none;
-  overflow: hidden;
-  width: 280px !important; /* LARGURA FIXA */
-}
-
-.custom-popup .leaflet-popup-content {
-  margin: 0 !important;
-  width: 280px !important; /* LARGURA FIXA */
-  line-height: 1.4;
-}
-
-.custom-popup .leaflet-popup-tip-container {
-  display: none; /* Remove a 'setinha' para um look mais clean e flutuante */
-}
-
-.custom-popup .leaflet-popup-tip {
-  background: rgba(255, 255, 255, 0.98);
-}
-
-/* Scrollbar Minimalista para o Admin */
-.custom-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scroll::-webkit-scrollbar-track {
-  background: transparent; 
-}
-.custom-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db; 
-  border-radius: 4px;
-}
-.custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af; 
-}
-
-/* --- SUPORTE A SAFE AREAS (iOS Notch / Home Bar) --- */
-.safe-area-padding {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
 
-/* Animação para Toasts */
-@keyframes slideIn {
-  from { transform: translateY(-100%); opacity: 0; }
+#public-sheet {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+}
+
+#admin-panel {
+  top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* --- LEAFLET CUSTOMIZADO (Look & Feel Moderno) --- */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: var(--shadow-premium) !important;
+  border-radius: 1rem !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom-in, 
+.leaflet-control-zoom-out {
+  background-color: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur);
+  color: var(--brand-dark) !important;
+  border: none !important;
+}
+
+/* Cards do Mapa (Popups Estabilizados) */
+.custom-popup .leaflet-popup-content-wrapper {
+  background: white;
+  border-radius: 1.25rem;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+  padding: 0 !important;
+  border: none;
+  overflow: hidden;
+  width: 280px !important;
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: 280px !important;
+  line-height: 1.5;
+}
+
+.custom-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
+/* --- COMPONENTES GLOBAIS --- */
+
+/* Scrollbar Minimalista (Substituindo o inline do HTML) */
+.custom-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* Animações Premium (Trabalhando em 60fps) */
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .toast-animate {
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Ajustes finos para Inputs no Mobile: evita zoom indesejado no iOS */
+/* Correções de UX Mobile */
 input, select, textarea {
-  font-size: 16px !important;
+  font-size: 16px !important; /* Impede o auto-zoom do Safari no iOS */
 }
 
-/* Transição de Blur para o Login */
-#auth-overlay.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-#auth-overlay {
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+/* Glassmorphism Classes */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+/* Dashboard Ranking Progress Bar (Base para o admin-dashboard.js) */
+.ranking-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #f3f4f6;
+  overflow: hidden;
+  position: relative;
+}
+.ranking-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--brand-dark);
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
