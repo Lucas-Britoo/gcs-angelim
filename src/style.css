@@ -122,7 +122,7 @@ input, select, textarea {
 .ranking-bar {
   height: 6px;
   border-radius: 3px;
-  background: #f3f4f6;
+  background: #f1f5f9;
   overflow: hidden;
   position: relative;
 }
@@ -132,5 +132,24 @@ input, select, textarea {
   left: 0;
   height: 100%;
   background: var(--brand-dark);
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 3px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Transições suaves para os itens do Portal */
+#admin-integrated-list > div {
+  transition: all 0.2s ease;
+}
+#admin-integrated-list > div:hover {
+  transform: translateX(4px);
+  border-color: var(--brand-dark);
+}
+
+/* Scrollbar para o Admin Integrado */
+#admin-integrated-list::-webkit-scrollbar {
+  width: 4px;
+}
+#admin-integrated-list::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
 }
