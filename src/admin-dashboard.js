@@ -109,6 +109,3 @@ function renderAdminTable(gcs, container) {
   container.innerHTML = listHtml;
   document.getElementById('back-to-stats').onclick = () => renderDashboard(gcs, container);
 }
-
-  container.innerHTML = statsHtml;
-}
