@@ -12,7 +12,7 @@ export async function initDatabase() {
   if (!db) {
     db = new Dexie(DB_NAME);
     db.version(DB_VERSION).stores({
-      growthGroups: '++id, nome, bairro, dia',
+      growthGroups: '++id, nome, bairro, dia_semana',
       pendingSync: '++id, action, data, timestamp'
     });
   }

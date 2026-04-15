@@ -27,7 +27,7 @@ export function optimizeImage(url) {
 export async function shareGrowthGroup(gc) {
   const shareData = {
     title: `GC ${gc.nome} - Angelim`,
-    text: `Participe do Grupo de Crescimento "${gc.nome}" em ${gc.bairro}. ${gc.dia} às ${gc.horario}.`,
+    text: `Participe do Grupo de Crescimento "${gc.nome}" em ${gc.bairro}. ${gc.dia_semana} às ${gc.horario}.`,
     url: window.location.href
   };
   
