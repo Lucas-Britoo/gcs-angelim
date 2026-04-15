@@ -84,8 +84,9 @@ function setupGeolocation() {
 
 function renderGroupMarkers(growthGroupsData) {
   if (!State.markersLayer) return;
+  const validGroups = (growthGroupsData || []).filter(g => g && g.nome);
   State.markersLayer.clearLayers();
-  growthGroupsData.forEach(group => {
+  validGroups.forEach(group => {
     if (!group.lat || !group.lng) return;
     const coords = [parseFloat(group.lat), parseFloat(group.lng)];
     const icon = L.divIcon({

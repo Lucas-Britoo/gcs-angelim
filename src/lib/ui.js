@@ -50,12 +50,14 @@ export function renderGrowthGroupList(growthGroups, onGroupClick) {
   const container = document.getElementById(GC_LIST_CONTAINER_ID);
   if (!container) return;
   
-  if (!growthGroups?.length) {
+  const validGroups = (growthGroups || []).filter(gc => gc && gc.nome);
+  
+  if (!validGroups.length) {
     container.innerHTML = `<div class="text-center py-20"><p class="text-gray-400 text-sm">Nenhum Grupo de Crescimento encontrado.</p></div>`;
     return;
   }
 
-  container.innerHTML = growthGroups.map(gc => {
+  container.innerHTML = validGroups.map(gc => {
     return `
       <div class="bg-white rounded-3xl p-4 border border-gray-100 flex gap-4 hover:shadow-md transition-shadow active:scale-[0.98] transition-all cursor-pointer metric-card" data-id="${gc.id}">
         <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
@@ -115,6 +117,8 @@ export function showErrorState(message) {
 }
 
 export function getPopupHtml(gc) {
+  if (!gc || !gc.nome) return '';
+  
   const thumbHtml = renderGCThumb(gc);
   return `
     <div class="p-0 overflow-hidden rounded-3xl bg-white">

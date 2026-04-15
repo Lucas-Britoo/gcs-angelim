@@ -76,6 +76,8 @@ export function safeStringify(obj) {
 }
 
 export function renderGCThumb(gc) {
+  if (!gc || !gc.nome) return '';
+  
   const optimizedPhoto = optimizeImage(gc.foto_url);
   
   if (optimizedPhoto) {
