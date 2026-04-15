@@ -3,7 +3,7 @@
  * Princípio SRP: apenas responsabilidades de UI
  */
 
-import { sanitize, triggerHaptic, renderGCThumb } from './utils.js';
+import { sanitize, triggerHaptic, renderGCThumb, safeStringify } from './utils.js';
 
 const TOAST_CONTAINER_ID = 'toast-container';
 const GC_LIST_CONTAINER_ID = 'public-gc-list';
@@ -70,7 +70,7 @@ export function renderGrowthGroupList(growthGroups, onGroupClick) {
           ${gc.lider ? `<p class="text-[9px] text-brand-dark font-medium mb-2">Líder: ${sanitize(gc.lider)}</p>` : ''}
           <div class="flex gap-2 flex-wrap">
             <button data-action="directions" data-lat="${gc.lat}" data-lng="${gc.lng}" class="flex-1 bg-gray-50 text-gray-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-gray-100 transition-all min-w-[80px]">Rotas 🚗</button>
-            <button data-action="share" data-group='${JSON.stringify(gc).replace(/'/g, "&#39;")}' class="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-blue-100 transition-all min-w-[80px]">Compartilhar 📤</button>
+            <button data-action="share" data-group='${safeStringify(gc).replace(/'/g, "&#39;")}' class="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-blue-100 transition-all min-w-[80px]">Compartilhar 📤</button>
             <a href="https://wa.me/55${(gc.contato || '').replace(/\D/g, '')}" target="_blank" class="flex-1 bg-green-50 text-green-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-green-100 transition-all flex items-center justify-center gap-1 min-w-[80px]">Zap 💬</a>
           </div>
         </div>
