@@ -134,3 +134,19 @@ export function getPopupHtml(gc) {
     </div>
   `;
 }
+
+export function toggleAdminUI(isLoggedIn) {
+  const adminPanel = document.getElementById('admin-panel');
+  const authOverlay = document.getElementById('auth-overlay');
+  
+  if (!adminPanel) return;
+  
+  if (isLoggedIn) {
+    adminPanel.classList.remove('hidden');
+    setTimeout(() => adminPanel.classList.add('admin-active'), 10);
+    if (authOverlay) authOverlay.classList.add('hidden');
+  } else {
+    adminPanel.classList.remove('admin-active');
+    setTimeout(() => adminPanel.classList.add('hidden'), 400);
+  }
+}

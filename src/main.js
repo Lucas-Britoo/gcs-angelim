@@ -6,7 +6,7 @@
 import L from 'leaflet';
 import { supabase, isSupabaseConfigured } from './lib/supabase.js';
 import { sanitize, triggerHaptic, shareGrowthGroup } from './lib/utils.js';
-import { showToast, renderLoadingSkeletons, renderGrowthGroupList, getPopupHtml } from './lib/ui.js';
+import { showToast, renderLoadingSkeletons, renderGrowthGroupList, getPopupHtml, toggleAdminUI } from './lib/ui.js';
 import { initAppServices, loadGrowthGroupsWithCache, subscribeToRealtimeChanges } from './services.js';
 import { renderDashboard } from './admin-dashboard.js';
 
@@ -32,12 +32,29 @@ async function initApp() {
     await initAppServices();
     initMap();
     initEventListeners();
+    initAuthListener();
     await loadGrowthGroups();
     setupRealtimeSync();
   } catch (error) {
     console.error('❌ Initialization failed:', error);
     showToast('Erro ao iniciar aplicativo', 'error');
   }
+}
+
+function initAuthListener() {
+  if (!supabase) return;
+  
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log('🔐 Auth Event:', event, session);
+    
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      if (session) {
+        toggleAdminUI(true);
+      }
+    } else if (event === 'SIGNED_OUT') {
+      toggleAdminUI(false);
+    }
+  });
 }
 
 function initMap() {
@@ -260,6 +277,16 @@ window.shareGC = async (group) => {
     const result = await shareGrowthGroup(groupObj);
     if (result) showToast(result, 'success');
   } catch (error) { showToast('Erro ao compartilhar', 'error'); }
+};
+
+window.signOut = async () => {
+  if (!supabase) return;
+  try {
+    await supabase.auth.signOut();
+    showToast('Logout realizado', 'success');
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
 };
 
 document.addEventListener('DOMContentLoaded', initApp);
