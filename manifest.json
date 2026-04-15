@@ -1,0 +1,40 @@
+{
+  "name": "GCs Angelim | Parnaíba",
+  "short_name": "GCs Angelim",
+  "description": "Encontre o Grupo de Crescimento mais próximo de você na Igreja Angelim Parnaíba.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#171717",
+  "background_color": "#ffffff",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "./public/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "./public/logo.jpeg",
+      "type": "image/jpeg",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./public/logo.jpeg",
+      "type": "image/jpeg",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explorar GCs",
+      "short_name": "Mapa",
+      "description": "Ver mapa de GCs",
+      "url": "./"
+    }
+  ]
+}

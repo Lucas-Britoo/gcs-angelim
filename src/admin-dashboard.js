@@ -5,8 +5,29 @@
 
 import { sanitize } from './main.js';
 
+export function showSkeletons() {
+  const container = document.getElementById('admin-content');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="grid grid-cols-2 gap-2 md:gap-3 mb-6">
+      <div class="bg-gray-200 animate-pulse h-24 rounded-3xl"></div>
+      <div class="bg-gray-200 animate-pulse h-24 rounded-3xl"></div>
+    </div>
+    <div class="bg-gray-100 p-4 md:p-5 rounded-3xl mb-8 space-y-4">
+      <div class="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+      <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+      <div class="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+    </div>
+  `;
+}
+
 export function renderDashboard(gcs, container) {
   if (!container || !gcs) return;
+
+  // Haptic Feedback on pointerdown
+  container.onpointerdown = (e) => {
+    if (navigator.vibrate) navigator.vibrate(10);
+  };
 
   const totalGCs = gcs.length;
   const districtCounts = {};
@@ -23,14 +44,14 @@ export function renderDashboard(gcs, container) {
 
   container.innerHTML = `
     <!-- 🟢 SEÇÃO 1: MÉTRICAS E INSIGHTS -->
-    <div class="grid grid-cols-2 gap-2 md:gap-3 mb-6">
-      <div class="bg-brand-dark text-white p-4 md:p-5 rounded-3xl shadow-xl relative overflow-hidden">
+    <div class="grid metric-grid grid-cols-2 gap-2 md:gap-3 mb-6">
+      <div class="bg-brand-dark text-white p-4 md:p-5 rounded-3xl shadow-xl relative overflow-hidden metric-card">
         <span class="block text-[8px] md:text-[9px] uppercase font-black text-brand-accent mb-1 tracking-widest">Total GCs</span>
-        <span class="text-3xl md:text-4xl font-black">${totalGCs}</span>
+        <span class="text-3xl md:text-4xl font-black metric-value">${totalGCs}</span>
       </div>
-      <div class="bg-white p-4 md:p-5 rounded-3xl border border-gray-100 shadow-sm">
+      <div class="bg-white p-4 md:p-5 rounded-3xl border border-gray-100 shadow-sm metric-card">
         <span class="block text-[8px] md:text-[9px] uppercase font-black text-gray-400 mb-1 tracking-widest">Bairros</span>
-        <span class="text-3xl md:text-4xl font-black text-gray-900">${Object.keys(districtCounts).length}</span>
+        <span class="text-3xl md:text-4xl font-black text-gray-900 metric-value">${Object.keys(districtCounts).length}</span>
       </div>
     </div>
 
