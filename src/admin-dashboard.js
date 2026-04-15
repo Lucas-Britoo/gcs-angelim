@@ -3,7 +3,7 @@
  * Gestão integrada de métricas e edição em uma única tela panorâmica.
  */
 
-import { sanitize } from './main.js';
+import { sanitize } from './lib/utils.js';
 
 export function showSkeletons() {
   const container = document.getElementById('admin-content');

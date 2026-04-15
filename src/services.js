@@ -3,8 +3,8 @@
  * Orquestra a lógica de dados entre Supabase e IndexedDB
  */
 
-import { supabase, isSupabaseConfigured } from './supabase.js';
-import { initDatabase, saveGrowthGroupsToCache, loadGrowthGroupsFromCache } from '../database.js';
+import { supabase, isSupabaseConfigured } from './lib/supabase.js';
+import { initDatabase, saveGrowthGroupsToCache, loadGrowthGroupsFromCache } from './database.js';
 
 const TABLE_NAME = 'gcs';
 
