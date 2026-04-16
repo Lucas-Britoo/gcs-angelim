@@ -109,8 +109,8 @@ export function subscribeToRealtimeChanges(callback) {
       console.log('📡 Alteração detectada:', payload.eventType);
       if (callback) callback(payload);
     })
-    .subscribe((status) => {
-      console.log('🔌 Status do Canal:', status);
+    .subscribe((status, err) => {
+      console.log('🔌 Status do Canal:', status, err ? err.message : '');
     });
   
   return channel;

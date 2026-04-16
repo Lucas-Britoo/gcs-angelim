@@ -68,7 +68,7 @@ export function renderGrowthGroupList(growthGroups, onGroupClick) {
             <h4 class="font-black text-gray-900 text-sm truncate uppercase tracking-tight">${sanitize(gc.nome)}</h4>
             <span class="text-[8px] font-bold bg-gray-50 text-gray-400 px-2 py-0.5 rounded-full uppercase truncate">${sanitize(gc.bairro)}</span>
           </div>
-          <p class="text-[10px] text-gray-500 font-semibold mb-1">${sanitize(gc.dia_semana || '')}, ${sanitize(gc.horario || '')}</p>
+          <p class="text-[10px] text-gray-500 font-semibold mb-1">${sanitize(gc.dia || gc.dia_semana || '')}, ${sanitize(gc.horario || '')}</p>
           ${gc.lider ? `<p class="text-[9px] text-brand-dark font-medium mb-2">Líder: ${sanitize(gc.lider)}</p>` : ''}
           <div class="flex gap-2 flex-wrap">
             <button data-action="directions" data-lat="${gc.lat}" data-lng="${gc.lng}" class="flex-1 bg-gray-50 text-gray-600 py-2 rounded-xl text-[9px] font-black uppercase text-center active:bg-gray-100 transition-all min-w-[80px]">Rotas 🚗</button>
