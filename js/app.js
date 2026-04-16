@@ -501,6 +501,78 @@ function initSwipe(handleId, targetId, activeClass) {
   handle.onclick = () => target.classList.toggle(activeClass);
 }
 
+// ─── COORDINATE PICKER ────────────────────────────────────────────────────────────
+let pickerMap = null;
+let pickerMarker = null;
+
+function initCoordinatePicker() {
+  const openBtn = document.getElementById('open-coordinate-picker');
+  const closeBtn = document.getElementById('close-coordinate-picker');
+  const cancelBtn = document.getElementById('cancel-coordinate-picker');
+  const confirmBtn = document.getElementById('confirm-coordinate-picker');
+  const modal = document.getElementById('coordinate-picker-modal');
+  const container = document.getElementById('picker-map');
+  const coordsLabel = document.getElementById('picker-coords');
+
+  if (!openBtn) return;
+
+  const openPicker = () => {
+    modal.classList.remove('hidden');
+    const latVal = document.getElementById('gc-lat').value;
+    const lngVal = document.getElementById('gc-lng').value;
+    const initialCenter = (latVal && lngVal) 
+      ? [parseFloat(latVal), parseFloat(lngVal)] 
+      : APP_CONFIG.MAP_CENTER; // Use APP_CONFIG
+
+    if (!pickerMap) {
+      pickerMap = L.map('picker-map', { zoomControl: true }).setView(initialCenter, APP_CONFIG.DEFAULT_ZOOM);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap'
+      }).addTo(pickerMap);
+
+      pickerMap.on('click', (e) => {
+        if (pickerMarker) pickerMarker.setLatLng(e.latlng);
+        else pickerMarker = L.marker(e.latlng).addTo(pickerMap);
+        coordsLabel.textContent = `Lat: ${e.latlng.lat.toFixed(6)}, Lng: ${e.latlng.lng.toFixed(6)}`;
+      });
+    } else {
+      pickerMap.setView(initialCenter, APP_CONFIG.DEFAULT_ZOOM);
+    }
+
+    if (latVal && lngVal) {
+      if (pickerMarker) pickerMarker.setLatLng(initialCenter);
+      else pickerMarker = L.marker(initialCenter).addTo(pickerMap);
+      coordsLabel.textContent = `Lat: ${parseFloat(latVal).toFixed(6)}, Lng: ${parseFloat(lngVal).toFixed(6)}`;
+    } else {
+      coordsLabel.textContent = 'Clique no mapa para selecionar';
+      if (pickerMarker) {
+        pickerMap.removeLayer(pickerMarker);
+        pickerMarker = null;
+      }
+    }
+    
+    setTimeout(() => pickerMap.invalidateSize(), 100);
+  };
+
+  const closePicker = () => {
+    modal.classList.add('hidden');
+  };
+
+  const confirmPicker = () => {
+    if (pickerMarker) {
+      const { lat, lng } = pickerMarker.getLatLng();
+      document.getElementById('gc-lat').value = lat.toFixed(6);
+      document.getElementById('gc-lng').value = lng.toFixed(6);
+    }
+    closePicker();
+  };
+
+  openBtn.onclick = openPicker;
+  closeBtn.onclick = closePicker;
+  cancelBtn.onclick = closePicker;
+  confirmBtn.onclick = confirmPicker;
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // Inicializa referências de DOM — seguro pois DOMContentLoaded garantiu o parse
@@ -510,6 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Vincula eventos que requerem DOM pronto
   bindCloseEditor();
   bindGCForm();
+  initCoordinatePicker();
 
   initMap();
   initSwipe('sheet-handle', 'public-sheet', 'drawer-active');

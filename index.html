@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#171717" />
   <meta name="mobile-web-app-capable" content="yes">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://ubxrhqehclgrpyzenuum.supabase.co https://*.supabase.co https://nominatim.openstreetmap.org https://unpkg.com; frame-src none; object-src 'none'; base-uri 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://ubxrhqehclgrpyzenuum.supabase.co wss://ubxrhqehclgrpyzenuum.supabase.co https://*.supabase.co wss://*.supabase.co https://nominatim.openstreetmap.org https://unpkg.com; frame-src none; object-src 'none'; base-uri 'self';">
   <title>ANGELIM | Parnaíba</title>
 
   <!-- PWA Manifest -->
@@ -160,12 +160,32 @@
                 <input type="text" id="gc-address" placeholder="Endereço Completo" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
               </div>
 
-              <input type="text" id="gc-lat" placeholder="Latitude (ex: -2.90)" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
-              <input type="text" id="gc-lng" placeholder="Longitude (ex: -41.76)" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
+              <div class="flex gap-2">
+                <input type="text" id="gc-lat" placeholder="Latitude (ex: -2.90)" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
+                <input type="text" id="gc-lng" placeholder="Longitude (ex: -41.76)" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-dark outline-none">
+                <button type="button" id="open-coordinate-picker" class="bg-brand-dark text-white px-4 rounded-2xl font-bold text-xs shadow-lg active:scale-95 transition-all whitespace-nowrap">Mapa</button>
+              </div>
             </div>
 
             <button type="submit" id="save-gc-btn" class="w-full bg-brand-dark text-white py-4 rounded-2xl font-bold text-sm shadow-xl active:scale-95 transition-all">Salvar Alterações</button>
           </form>
+        </div>
+
+        <div id="coordinate-picker-modal" class="fixed inset-0 z-[9999] bg-black/80 hidden flex items-center justify-center p-4">
+          <div class="bg-white rounded-3xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h3 class="font-bold text-gray-800">Selecionar Coordenadas</h3>
+              <button id="close-coordinate-picker" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <div id="picker-map" class="h-[400px] w-full bg-gray-100"></div>
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-2">
+              <span id="picker-coords" class="text-xs text-gray-500 mr-auto self-center"></span>
+              <button type="button" id="cancel-coordinate-picker" class="px-4 py-2 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100">Cancelar</button>
+              <button type="button" id="confirm-coordinate-picker" class="px-6 py-2 rounded-xl text-sm font-bold bg-brand-dark text-white shadow-lg active:scale-95">Confirmar</button>
+            </div>
+          </div>
         </div>
       </div>
     </aside>
