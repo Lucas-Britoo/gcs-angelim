@@ -137,5 +137,6 @@ export async function loadGrowthGroupsWithCache() {
     await saveGrowthGroupsToCache(result.data);
   }
   
-  return result.data;
+  // RETURN DATA EVEN IF IT'S EMPTY BUT NO ERROR (to avoid infinite loading)
+  return result.data || [];
 }

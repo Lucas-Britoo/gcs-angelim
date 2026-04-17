@@ -229,9 +229,20 @@ function setupSearch() {
   if (!searchInput) return;
   
   searchInput.oninput = (event) => {
-    const term = event.target.value.toLowerCase();
-    if (!term) { renderGrowthGroupList(State.growthGroups, handleGroupClick); renderGroupMarkers(State.growthGroups); return; }
-    const filtered = State.growthGroups.filter(g => g.nome?.toLowerCase().includes(term) || g.bairro?.toLowerCase().includes(term));
+    const term = event.target.value.toLowerCase().trim();
+    if (!term) { 
+      renderGrowthGroupList(State.growthGroups, handleGroupClick); 
+      renderGroupMarkers(State.growthGroups); 
+      return; 
+    }
+    const filtered = State.growthGroups.filter(g => 
+      g.nome?.toLowerCase().includes(term) || 
+      g.bairro?.toLowerCase().includes(term) ||
+      g.lider?.toLowerCase().includes(term) ||
+      g.dia?.toLowerCase().includes(term) ||
+      g.dia_semana?.toLowerCase().includes(term) ||
+      g.endereco?.toLowerCase().includes(term)
+    );
     renderGrowthGroupList(filtered, handleGroupClick);
     renderGroupMarkers(filtered);
   };
@@ -248,16 +259,46 @@ function setupGestures() {
 }
 
 function setupGesture(handleElement, targetElement, activeClass) {
-  let startY = 0, currentY = 0;
-  handleElement.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
-  handleElement.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY; }, { passive: true });
-  handleElement.addEventListener('touchend', () => {
-    const diff = startY - currentY;
-    if (Math.abs(diff) < 30) return;
-    if (diff > 50) targetElement.classList.add(activeClass);
-    else if (diff < -50) targetElement.classList.remove(activeClass);
+  // GESTURE SWIPE DETECTION
+  let startY = 0;
+  let isSwiping = false;
+  let startTime = 0;
+
+  handleElement.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    startTime = Date.now();
+    isSwiping = false;
+  }, { passive: true });
+
+  handleElement.addEventListener('touchmove', (e) => {
+    const currentY = e.touches[0].clientY;
+    if (Math.abs(currentY - startY) > 10) {
+      isSwiping = true;
+    }
+  }, { passive: true });
+
+  handleElement.addEventListener('touchend', (e) => {
+    const endY = e.changedTouches[0].clientY;
+    const diff = startY - endY;
+    const duration = Date.now() - startTime;
+
+    if (isSwiping || Math.abs(diff) > 20) {
+      // SWIPE DETECTED
+      if (diff > 30) targetElement.classList.add(activeClass);
+      else if (diff < -30) targetElement.classList.remove(activeClass);
+    }
   });
-  handleElement.onclick = () => targetElement.classList.toggle(activeClass);
+
+  // CLICK / TAP DETECTION (Toggle)
+  handleElement.addEventListener('click', (e) => {
+    // Only toggle if it wasn't a swipe
+    if (!isSwiping) {
+      targetElement.classList.toggle(activeClass);
+    }
+  });
+  
+  // Also allow clicking anywhere on the handle bar to toggle
+  handleElement.style.cursor = 'pointer';
 }
 
 window.focusGC = handleGroupClick;

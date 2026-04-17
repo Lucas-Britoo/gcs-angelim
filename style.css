@@ -336,7 +336,7 @@ input, select, textarea {
   transform: translateY(calc(100% - 130px));
   height: 75vh; pointer-events: auto; overflow: hidden; touch-action: pan-y;
 }
-#public-sheet.drawer-active { transform: translateY(0); }
+#public-sheet.drawer-active { transform: translateY(0) !important; }
 
 #sheet-handle {
   width: 100%; display: flex; justify-content: center; padding: 1rem 0;
